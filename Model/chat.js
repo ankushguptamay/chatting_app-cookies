@@ -5,13 +5,23 @@ module.exports = (sequelize, DataTypes) => {
             defaultValue: DataTypes.UUIDV4,
             primaryKey: true
         },
-        chatType: {
-            type: DataTypes.STRING,
-            validate: {
-                isIn: [['Private', 'Group']]
-            }
+        isGroup: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: true
         },
-        groupName: {
+        chatName: {
+            type: DataTypes.STRING
+        },
+        creator: {
+            type: DataTypes.STRING
+        },
+        avatar_url: {
+            type: DataTypes.STRING(1234)
+        },
+        fileName: {
+            type: DataTypes.STRING(1234)
+        },
+        avatar_public_id: {
             type: DataTypes.STRING
         }
     });

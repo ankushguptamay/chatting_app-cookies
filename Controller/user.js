@@ -1,11 +1,17 @@
 const db = require('../Model');
 const { validateUser, userLogin } = require("../Middleware/validation");
 const User = db.user;
+const Chat = db.chat;
+const Chat_User = db.chats_user;
 const { USER_JWT_SECRET_KEY, JWT_VALIDITY } = process.env;
+const { deleteSingleFile } = require("../Utils/helper");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { Op } = require("sequelize");
 const SALT = 10;
+
+//addUpdateAvatar
+//deleteAvatar
 
 exports.register = async (req, res) => {
     try {
@@ -133,19 +139,79 @@ exports.getMe = async (req, res) => {
     }
 };
 
-exports.getAllUser = async (req, res) => {
+exports.searchUser = async (req, res) => {
     try {
+        const { name } = req.body;
+        let condition = {
+            email: { [Op.ne]: req.user.email }
+        };
+        if (name) {
+            condition = {
+                ...condition,
+                name: { [Op.startsWith]: name }
+            };
+        }
         // If Email is already present
         const user = await User.findAll({
-            where: {
-                email: { [Op.ne]: req.user.email }
-            }
+            limit: 10,
+            where: condition
         });
         // Send final success response
         res.status(200).send({
             success: true,
-            message: 'User details successfully!',
+            message: 'User fetched successfully!',
             data: user
+        });
+    } catch (err) {
+        res.status(500).send({
+            success: false,
+            message: err.message
+        });
+    }
+};
+
+exports.addUpdateUserAvatar = async (req, res) => {
+    try {
+        // File should be exist
+        if (!req.file) {
+            return res.status(400).send({
+                success: false,
+                message: "Please..upload an Avatar!"
+            });
+        }
+        const avatar = await User.findOne({
+            where: {
+                id: req.user.id
+            }
+        });
+        if (avatar.avatar_url) {
+            deleteSingleFile(avatar.avatar_url);
+        }
+        await avatar.update({ ...avatar, avatar_url: req.file.path, fileName: req.file.filename });
+        // Final response
+        res.status(200).send({
+            success: true,
+            message: "Avatar added successfully!"
+        });
+    } catch (err) {
+        res.status(500).send({
+            success: false,
+            message: err.message
+        });
+    }
+};
+
+exports.deleteUserAvatar = async (req, res) => {
+    try {
+        const user = await User.findOne({ where: { id: req.user.id } });
+        deleteSingleFile(user.avatar_url);
+        await user.update({
+            avatar_url: null, fileName: null
+        },);
+        // Final response
+        res.status(200).send({
+            success: true,
+            message: `Avatar deleted successfully!`
         });
     } catch (err) {
         res.status(500).send({

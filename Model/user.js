@@ -16,6 +16,15 @@ module.exports = (sequelize, DataTypes) => {
         },
         password: {
             type: DataTypes.STRING
+        },
+        avatar_url: {
+            type: DataTypes.STRING(1234)
+        },
+        fileName: {
+            type: DataTypes.STRING(1234)
+        },
+        avatar_public_id: {
+            type: DataTypes.STRING
         }
     });
 

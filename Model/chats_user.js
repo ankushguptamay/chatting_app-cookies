@@ -7,6 +7,13 @@ module.exports = (sequelize, DataTypes) => {
         },
         userName: {
             type: DataTypes.STRING
+        },
+        avatar_url: {
+            type: DataTypes.STRING
+        },
+        isAdmin: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
         }
     });
 
