@@ -1,20 +1,20 @@
 const joi = require("joi");
+const { password } = require("../Config/db.config");
 
 exports.validateUser = (data) => {
   const schema = joi.object().keys({
     fullName: joi.string().min(3).max(50).required(),
-    email: joi.string().email().optional().label("Email"),
+    email: joi.string().email().required().label("Email"),
     mobileNumber: joi
       .string()
       .length(10)
       .pattern(/^[0-9]+$/)
-      .optional(),
+      .required(),
     password: joi
       .string()
       // .regex(RegExp(pattern))
       .required()
-      .min(8)
-      .max(8),
+      .min(8),
   });
   return schema.validate(data);
 };
@@ -26,8 +26,7 @@ exports.userLogin = (data) => {
       .string()
       // .regex(RegExp(pattern))
       .required()
-      .min(8)
-      .max(8),
+      .min(8),
   }); //.options({ allowUnknown: true });
   return schema.validate(data);
 };
@@ -73,6 +72,19 @@ exports.sendFriendRequest = (data) => {
 exports.acceptFriendRequest = (data) => {
   const schema = joi.object().keys({
     accept: joi.boolean().required(),
+  });
+  return schema.validate(data);
+};
+
+exports.adminRegistration = (data) => {
+  const schema = joi.object().keys({
+    name: joi.string().required(),
+    email: joi.string().email().required().label("Email"),
+    password: joi
+      .string()
+      // .regex(RegExp(pattern))
+      .required()
+      .min(8),
   });
   return schema.validate(data);
 };

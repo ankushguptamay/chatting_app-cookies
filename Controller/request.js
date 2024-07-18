@@ -114,7 +114,7 @@ exports.acceptFriendRequest = async (req, res) => {
     }
     let chat;
     const members = [request.sender.id, id];
-    const newChat = await Chat.create({ isGroup: false, creator: id });
+    const newChat = await Chat.create({ isGroup: false });
     const users = [];
     for (let i = 0; i < members.length; i++) {
       const user = await User.findOne({ where: { id: members[i] } });

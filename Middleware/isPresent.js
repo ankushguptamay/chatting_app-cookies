@@ -1,5 +1,6 @@
 const db = require("../Model");
 const User = db.user;
+const Admin = db.admin;
 const { Op } = require("sequelize");
 
 exports.isUserPresent = async (req, res, next) => {
@@ -19,6 +20,24 @@ exports.isUserPresent = async (req, res, next) => {
       avatar_url: user.avatar_url,
       userName: user.fullName,
     };
+    next();
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+  }
+};
+
+exports.isAdminPresent = async (req, res, next) => {
+  try {
+    const admin = await Admin.findOne({
+      where: {
+        [Op.and]: [{ id: req.admin.id }, { email: req.admin.email }],
+      },
+    });
+    if (!admin) {
+      return res.send({
+        message: "admin is not present! Are you register?.. ",
+      });
+    }
     next();
   } catch (err) {
     res.status(500).send({ message: err.message });

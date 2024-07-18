@@ -22,6 +22,7 @@ const queryInterface = sequelize.getQueryInterface();
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
+db.admin = require("./adminModel.js")(sequelize, Sequelize);
 db.user = require("./user.js")(sequelize, Sequelize);
 db.request = require("./request.js")(sequelize, Sequelize);
 db.chat = require("./chat.js")(sequelize, Sequelize);

@@ -651,3 +651,115 @@ exports.deleteGroupAvatar = async (req, res) => {
     });
   }
 };
+
+exports.allChat = async (req, res) => {
+  try {
+    const chat = await Chat.findAll({
+      include: [
+        {
+          model: Chat_User,
+          as: "members",
+        },
+      ],
+    });
+    const transFormChat = await Promise.all(
+      chat.map(
+        async ({ id, creator, isGroup, members, avatar_url, chatName }) => {
+          let groupCreator;
+          if (creator) {
+            groupCreator = await User.findOne({
+              where: { id: creator },
+              attributes: ["avatar_url", "fullName", "id"],
+            });
+          }
+          const totalMessage = await Message.count({ where: { chatId: id } });
+          return {
+            id,
+            isGroup,
+            avatar_url: avatar_url
+              ? avatar_url
+              : members
+                  .slice(0, 3)
+                  .map((member) => member.dataValues.avatar_url),
+            members: members.map(({ id, userId, userName, avatar_url }) => ({
+              id,
+              userId,
+              userName,
+              avatar_url,
+            })),
+            chatName: chatName ? chatName : "Private",
+            creator: groupCreator ? { ...groupCreator.dataValues } : "None",
+            totalmembers: members.length,
+            totalMessage,
+          };
+        }
+      )
+    );
+    res.status(200).json({
+      success: true,
+      message: "Chat fetched successfully!",
+      data: transFormChat,
+    });
+  } catch (err) {
+    res.status(500).send({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+exports.getDashboardStatus = async (req, res) => {
+  try {
+    const today = new Date();
+    const last7Days = new Date();
+    const daysInMilliSecond = 1000 * 60 * 60 * 24;
+    last7Days.setDate(last7Days.getDate() - 7);
+
+    const [
+      groupsCount,
+      userCount,
+      messageCount,
+      totalChatCount,
+      last7DaysMessage,
+    ] = await Promise.all([
+      Chat.count({ where: { isGroup: true } }),
+      User.count(),
+      Message.count(),
+      Chat.count(),
+      Message.findAll({
+        where: { createdAt: { [Op.gte]: last7Days } },
+        attributes: ["createdAt"],
+      }),
+    ]);
+
+    const messages = new Array(7).fill(0);
+    // console.log(last7DaysMessage);
+    last7DaysMessage.forEach((message) => {
+      const indexApprox =
+        (today.getTime() - message.dataValues.createdAt.getTime()) /
+        daysInMilliSecond;
+      const index = Math.floor(indexApprox);
+      messages[6 - index]++;
+    });
+
+    const status = {
+      groupsCount,
+      userCount,
+      messageCount,
+      totalChatCount,
+      privateChat: totalChatCount - groupsCount,
+      messageChart: messages,
+    };
+
+    res.status(200).json({
+      success: true,
+      message: "Dashboard fetched successfully!",
+      data: status,
+    });
+  } catch (err) {
+    res.status(500).send({
+      success: false,
+      message: err.message,
+    });
+  }
+};
