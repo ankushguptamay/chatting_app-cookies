@@ -16,11 +16,15 @@ const io = new Server(server, {
   },
 });
 
-app.use(
-  cors({
-    origin: "*", // Your frontend URL
-  })
-);
+const corsOptions = {
+  origin: [
+    "http://127.0.0.1:5173",
+    "http://localhost:4173",
+    process.env.CLIENT_URL,
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+};
 
 db.sequelize
   .sync()
@@ -30,7 +34,7 @@ db.sequelize
   .catch((error) => console.log(error));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cors(corsOptions));
 
 app.use("/user", user);
 app.use("/admin", admin);

@@ -21,3 +21,5 @@ module.exports = (sequelize, DataTypes) => {
   });
   return Request;
 };
+
+// sender: { id: id, avatar_url: avatar_url, userName: userName }
