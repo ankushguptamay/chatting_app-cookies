@@ -152,14 +152,14 @@ exports.getMe = async (req, res) => {
 
 exports.searchUser = async (req, res) => {
   try {
-    const { name } = req.body;
+    const { name } = req.query;
     let condition = {
       email: { [Op.ne]: req.user.email },
     };
     if (name) {
       condition = {
         ...condition,
-        name: { [Op.startsWith]: name },
+        fullName: { [Op.startsWith]: name },
       };
     }
     // If Email is already present
