@@ -5,6 +5,8 @@ const db = require("./Model");
 const cors = require("cors");
 const { createServer } = require("node:http");
 const user = require("./Route/user");
+const { socketAuthenticator } = require("./Middleware/verifyJWTToken");
+const cookieParser = require("cookie-parser");
 const admin = require("./Route/admin");
 const { Server } = require("socket.io");
 
@@ -33,6 +35,7 @@ db.sequelize
   })
   .catch((error) => console.log(error));
 app.use(bodyParser.json());
+app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
 
@@ -43,6 +46,14 @@ app.get("/", (req, res) => {
 });
 
 const onlineUser = [];
+
+io.use((socket, next) => {
+  cookieParser()(
+    socket.request,
+    socket.request.res,
+    async (err) => await socketAuthenticator(err, socket, next)
+  );
+});
 
 io.on("connection", (socket) => {
   console.log("User connected", socket.id);

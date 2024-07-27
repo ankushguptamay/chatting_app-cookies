@@ -1,5 +1,5 @@
 const express = require("express");
-const { register, login, getAdmin } = require("../Controller/admin");
+const { register, login, getAdmin, logOut } = require("../Controller/admin");
 const { getAlluser } = require("../Controller/user");
 const { allChat, getDashboardStatus } = require("../Controller/chat");
 const {} = require("../Controller/request");
@@ -12,6 +12,7 @@ const { isAdminPresent } = require("../Middleware/isPresent");
 
 chat.post("/register", register);
 chat.post("/login", login);
+chat.post("/logOut", logOut);
 chat.get("/", verifyAdminJWT, getAdmin);
 
 chat.get("/users", verifyAdminJWT, isAdminPresent, getAlluser);

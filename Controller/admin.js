@@ -1,8 +1,7 @@
 const db = require("../Model");
 const Admin = db.admin;
 const { userLogin, adminRegistration } = require("../Middleware/validation");
-const { ADMIN_JWT_SECRET_KEY, JWT_VALIDITY } = process.env;
-const jwt = require("jsonwebtoken");
+const { sendToken, cookieOptions } = require("../Utils/feature");
 const bcrypt = require("bcryptjs");
 const { Op } = require("sequelize");
 const SALT = 10;
@@ -30,20 +29,7 @@ exports.register = async (req, res) => {
       ...req.body,
       password: hashedPassword,
     });
-    const data = {
-      id: admin.id,
-      email: req.body.email,
-    };
-    const authToken = jwt.sign(
-      data,
-      ADMIN_JWT_SECRET_KEY,
-      { expiresIn: JWT_VALIDITY } // five day
-    );
-    res.status(200).send({
-      success: true,
-      message: "Register successfully!",
-      authToken: authToken,
-    });
+    sendToken(res, admin, 201, "Admin created", "chat-admin-token");
   } catch (err) {
     res.status(500).send({
       success: false,
@@ -80,20 +66,30 @@ exports.login = async (req, res) => {
         message: "Invalid email or password!",
       });
     }
-    const data = {
-      id: admin.id,
-      email: req.body.email,
-    };
-    const authToken = jwt.sign(
-      data,
-      ADMIN_JWT_SECRET_KEY,
-      { expiresIn: JWT_VALIDITY } // five day
+    sendToken(
+      res,
+      admin,
+      200,
+      `Welcome Back, ${admin.name}`,
+      "chat-admin-token"
     );
-    res.status(200).send({
-      success: true,
-      message: "Login successfully!",
-      authToken: authToken,
+  } catch (err) {
+    res.status(500).send({
+      success: false,
+      message: err.message,
     });
+  }
+};
+
+exports.logOut = async (req, res) => {
+  try {
+    return res
+      .status(200)
+      .cookie("chat-admin-token", "", { ...cookieOptions, maxAge: 0 })
+      .json({
+        success: true,
+        message: "Logged out successfully",
+      });
   } catch (err) {
     res.status(500).send({
       success: false,

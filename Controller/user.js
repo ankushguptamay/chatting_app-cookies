@@ -4,11 +4,13 @@ const User = db.user;
 const Chat = db.chat;
 const Chat_User = db.chats_user;
 const Request = db.request;
-const { USER_JWT_SECRET_KEY, JWT_VALIDITY } = process.env;
 const { deleteSingleFile } = require("../Utils/helper");
-const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { Op } = require("sequelize");
+const { sendToken, cookieOptions } = require("../Utils/feature");
+const { uploadFileToBunny, deleteFileToBunny } = require("../Utils/bunny");
+const fs = require("fs");
+const bunnyFolderName = "attachment";
 const SALT = 10;
 
 exports.register = async (req, res) => {
@@ -38,27 +40,8 @@ exports.register = async (req, res) => {
       ...req.body,
       password: hashedPassword,
     });
-    // generate JWT Token
-    const authToken = jwt.sign(
-      {
-        id: user.id,
-        email: req.body.email,
-      },
-      USER_JWT_SECRET_KEY,
-      { expiresIn: JWT_VALIDITY } // five day
-    );
     // Send final success response
-    res.status(200).send({
-      success: true,
-      message: "Registered successfully!",
-      data: {
-        authToken: authToken,
-        fullName: req.body.fullName,
-        email: req.body.email,
-        mobileNumber: req.body.mobileNumber,
-        id: user.id,
-      },
-    });
+    sendToken(res, user, 201, "User created", "chat-user-token");
   } catch (err) {
     res.status(500).send({
       success: false,
@@ -98,27 +81,32 @@ exports.login = async (req, res) => {
         message: "Invalid email or password!",
       });
     }
-    // generate JWT Token
-    const authToken = jwt.sign(
-      {
-        id: user.id,
-        email: req.body.email,
-      },
-      USER_JWT_SECRET_KEY,
-      { expiresIn: JWT_VALIDITY } // five day
-    );
     // Send final success response
-    res.status(200).send({
-      success: true,
-      message: "Loged in successfully!",
-      data: {
-        authToken: authToken,
-        fullName: user.fullName,
-        email: req.body.email,
-        mobileNumber: user.mobileNumber,
-        id: user.id,
-      },
+    sendToken(
+      res,
+      user,
+      200,
+      `Welcome Back, ${user.fullName}`,
+      "chat-user-token"
+    );
+  } catch (err) {
+    res.status(500).send({
+      success: false,
+      message: err.message,
     });
+  }
+};
+
+exports.logOut = async (req, res) => {
+  try {
+    console.log(req.cookies["chat-user-token"]);
+    return res
+      .status(200)
+      .cookie("chat-user-token", "", { ...cookieOptions, maxAge: 0 })
+      .json({
+        success: true,
+        message: "Logged out successfully",
+      });
   } catch (err) {
     res.status(500).send({
       success: false,
@@ -195,12 +183,16 @@ exports.addUpdateUserAvatar = async (req, res) => {
         id: req.user.id,
       },
     });
-    if (avatar.avatar_url) {
-      deleteSingleFile(avatar.avatar_url);
+    //Upload file
+    const fileStream = fs.createReadStream(req.file.path);
+    await uploadFileToBunny(bunnyFolderName, fileStream, req.file.filename);
+    deleteSingleFile(req.file.path);
+    if (avatar.fileName) {
+      await deleteFileToBunny(bunnyFolderName, avatar.fileName);
     }
     await avatar.update({
       ...avatar,
-      avatar_url: req.file.path,
+      avatar_url: `${process.env.SHOW_BUNNY_FILE_HOSTNAME}/${bunnyFolderName}/${req.file.filename}`,
       fileName: req.file.filename,
     });
     // Final response
@@ -219,7 +211,7 @@ exports.addUpdateUserAvatar = async (req, res) => {
 exports.deleteUserAvatar = async (req, res) => {
   try {
     const user = await User.findOne({ where: { id: req.user.id } });
-    deleteSingleFile(user.avatar_url);
+    await deleteFileToBunny(bunnyFolderName, user.fileName);
     await user.update({
       avatar_url: null,
       fileName: null,

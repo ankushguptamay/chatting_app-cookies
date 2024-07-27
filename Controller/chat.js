@@ -16,7 +16,14 @@ const {
   NEW_MESSAGE_ALERT,
   FETCHED_CHAT,
 } = require("../Utils/event");
-const { getOtherMember, getSingleChat } = require("../Utils/helper");
+const {
+  getOtherMember,
+  getSingleChat,
+  deleteSingleFile,
+} = require("../Utils/helper");
+const { uploadFileToBunny, deleteFileToBunny } = require("../Utils/bunny");
+const fs = require("fs");
+const bunnyFolderName = "attachment";
 const { Op } = require("sequelize");
 
 exports.createGroupChat = async (req, res) => {
@@ -396,9 +403,13 @@ exports.createMessage = async (req, res) => {
     const attachments = [];
     if (files) {
       for (let i = 0; i < files.length; i++) {
+        //Upload file
+        const fileStream = fs.createReadStream(files[i].path);
+        await uploadFileToBunny(bunnyFolderName, fileStream, files[i].filename);
+        deleteSingleFile(files[i].path);
         const attachment = await MessageAttachment.create({
           attachment_url: files[i].path,
-          attachmentName: files[i].filename,
+          attachmentName: `${process.env.SHOW_BUNNY_FILE_HOSTNAME}/${bunnyFolderName}/${files[i].filename}`,
           messageId: chat.id,
         });
         attachments.push(attachment);
@@ -565,6 +576,7 @@ exports.addUpdateGroupAvatar = async (req, res) => {
       },
     });
     if (!chat) {
+      deleteSingleFile(chat.avatar_url);
       return res.status(400).json({
         success: false,
         message: "Group is not present!",
@@ -574,23 +586,29 @@ exports.addUpdateGroupAvatar = async (req, res) => {
       where: { chatId: chat.id, userId: req.user.id },
     });
     if (!user) {
+      deleteSingleFile(chat.avatar_url);
       return res.status(400).json({
         success: false,
         message: "Member is not present!",
       });
     }
     if (!user.isAdmin) {
+      deleteSingleFile(chat.avatar_url);
       return res.status(400).json({
         success: false,
         message: "Only admin can add or update!!",
       });
     }
+    //Upload file
+    const fileStream = fs.createReadStream(req.file.path);
+    await uploadFileToBunny(bunnyFolderName, fileStream, req.file.filename);
+    deleteSingleFile(req.file.path);
     if (chat.avatar_url) {
-      deleteSingleFile(chat.avatar_url);
+      await deleteFileToBunny(bunnyFolderName, chat.fileName);
     }
     // Socket Event Will Fire to all members
     await chat.update({
-      avatar_url: req.file.path,
+      avatar_url: `${process.env.SHOW_BUNNY_FILE_HOSTNAME}/${bunnyFolderName}/${req.file.filename}`,
       fileName: req.file.filename,
     });
     // Final response
@@ -636,7 +654,7 @@ exports.deleteGroupAvatar = async (req, res) => {
       });
     }
     if (chat.avatar_url) {
-      deleteSingleFile(chat.avatar_url);
+      await deleteFileToBunny(bunnyFolderName, chat.fileName);
     }
     await chat.update({ avatar_url: null, fileName: null });
     // Final response
