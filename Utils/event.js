@@ -14,3 +14,7 @@ exports.CHAT_JOINED = "CHAT_JOINED";
 exports.CHAT_LEAVED = "CHAT_LEAVED";
 
 exports.ONLINE_USERS = "ONLINE_USERS";
+
+exports.emitEvent = (req, events, user, data) => {
+    console.log("Event Emited", events);
+  };
