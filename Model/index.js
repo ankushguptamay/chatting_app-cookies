@@ -21,6 +21,7 @@ const db = {};
 const queryInterface = sequelize.getQueryInterface();
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
+db.DataTypes = DataTypes;
 
 db.admin = require("./adminModel.js")(sequelize, Sequelize);
 db.user = require("./user.js")(sequelize, Sequelize);

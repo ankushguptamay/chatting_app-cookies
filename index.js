@@ -9,6 +9,16 @@ const { socketAuthenticator } = require("./Middleware/verifyJWTToken");
 const cookieParser = require("cookie-parser");
 const admin = require("./Route/admin");
 const { Server } = require("socket.io");
+const { getSockets } = require("./Utils/helper");
+const {
+  CHAT_JOINED,
+  CHAT_LEAVED,
+  NEW_MESSAGE,
+  NEW_MESSAGE_ALERT,
+  ONLINE_USERS,
+  START_TYPING,
+  STOP_TYPING,
+} = require("./Utils/event");
 
 const app = express();
 const server = createServer(app);
@@ -45,7 +55,8 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-const onlineUser = [];
+const userSocketIDs = new Map();
+const onlineUsers = new Set();
 
 io.use((socket, next) => {
   cookieParser()(
@@ -56,32 +67,72 @@ io.use((socket, next) => {
 });
 
 io.on("connection", (socket) => {
-  console.log("User connected", socket.id);
-  // Online User
-  socket.on("onlineUser", (userId) => {
-    !onlineUser.some((user) => user.userId === userId) &&
-      onlineUser.push({
-        userId: userId,
-        socketId: socket.id,
-      });
-    io.emit("getOnlineUser", { onlineUser: onlineUser });
+  const user = socket.user;
+  userSocketIDs.set(user.id.toString(), socket.id);
+
+  socket.on(NEW_MESSAGE, async ({ chatId, members, message }) => {
+    const messageForRealTime = {
+      message: message,
+      id: db.DataTypes.UUIDV4,
+      sender: {
+        id: user.id,
+        name: user.name,
+        avatar_url: user.avatar_url,
+      },
+      chat: chatId,
+      createdAt: new Date().toISOString(),
+    };
+
+    const messageForDB = {
+      message: message,
+      senderId: user.id,
+      chatId: chatId,
+      userName: user.userName,
+      avatar_url: user.avatar_url,
+    };
+
+    const membersSocket = getSockets(members);
+    io.to(membersSocket).emit(NEW_MESSAGE, {
+      chatId,
+      message: messageForRealTime,
+    });
+    io.to(membersSocket).emit(NEW_MESSAGE_ALERT, { chatId });
+
+    try {
+      await db.chatMessage.create(messageForDB);
+    } catch (error) {
+      throw new Error(error);
+    }
   });
-  // Send Message
-  socket.on("send-message", (room, message) => {
-    socket.to(room).emit("message-received", message);
+
+  socket.on(START_TYPING, ({ members, chatId }) => {
+    const membersSockets = getSockets(members);
+    socket.to(membersSockets).emit(START_TYPING, { chatId });
   });
-  // Join
-  socket.on("join-room", (room, userName) => {
-    console.log(userName);
-    socket.join(room);
+
+  socket.on(STOP_TYPING, ({ members, chatId }) => {
+    const membersSockets = getSockets(members);
+    socket.to(membersSockets).emit(STOP_TYPING, { chatId });
   });
-  // Typing
-  socket.on("is-typing", (room, userName) => {
-    socket.to(room).emit("typing", { userName: userName });
+
+  socket.on(CHAT_JOINED, ({ userId, members }) => {
+    onlineUsers.add(userId.toString());
+
+    const membersSocket = getSockets(members);
+    io.to(membersSocket).emit(ONLINE_USERS, Array.from(onlineUsers));
   });
-  // Disconnect
+
+  socket.on(CHAT_LEAVED, ({ userId, members }) => {
+    onlineUsers.delete(userId.toString());
+
+    const membersSocket = getSockets(members);
+    io.to(membersSocket).emit(ONLINE_USERS, Array.from(onlineUsers));
+  });
+
   socket.on("disconnect", () => {
-    io.emit("getOnlineUser", { onlineUser: onlineUser });
+    userSocketIDs.delete(user._id.toString());
+    onlineUsers.delete(user._id.toString());
+    socket.broadcast.emit(ONLINE_USERS, Array.from(onlineUsers));
   });
 });
 

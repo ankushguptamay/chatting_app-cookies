@@ -36,6 +36,12 @@ const deleteSingleFile = (filePath) => {
   return;
 };
 
+const getSockets = (users = []) => {
+  const sockets = users.map((user) => userSocketIDs.get(user.toString()));
+
+  return sockets;
+};
+
 class ErrorHandler extends Error {
   constructor(message, statusCode) {
     super(message);
@@ -48,4 +54,5 @@ module.exports = {
   deleteSingleFile,
   getSingleChat,
   getOtherMember,
+  getSockets,
 };

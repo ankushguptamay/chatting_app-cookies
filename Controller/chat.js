@@ -12,9 +12,9 @@ const Message = db.chatMessage;
 const MessageAttachment = db.messageAttachment;
 const {
   ALERT,
-  NEW_ATTACHMENT,
+  NEW_MESSAGE,
   NEW_MESSAGE_ALERT,
-  FETCHED_CHAT,
+  REFETCH_CHATS,
 } = require("../Utils/event");
 const {
   getOtherMember,
@@ -71,7 +71,12 @@ exports.createGroupChat = async (req, res) => {
     }
     // Socket Event Will Fire to all members that `${chatName} group is created by ${creatorName}`;
     const response = { ...chat.dataValues, members: users };
+    const otherMember = getOtherMember(users, userId);
     const transForm = getSingleChat(response, req.user.id);
+
+    emitEvent(req, ALERT, users, `Welcome to ${chatName} group`);
+    emitEvent(req, REFETCH_CHATS, otherMember);
+
     res.status(200).json({
       success: true,
       message: "Group created successfully!",
@@ -199,6 +204,7 @@ exports.addMembers = async (req, res) => {
         message: "You can not add members!",
       });
     }
+    const newAddedUserName = [];
     for (let i = 0; i < members.length; i++) {
       const user = await User.findOne({ where: { id: members[i] } });
       if (user) {
@@ -217,10 +223,23 @@ exports.addMembers = async (req, res) => {
             avatar_url: user.avatar_url,
             isAdmin: isAdmin,
           });
+          newAddedUserName.push(user.fullName);
         }
       }
     }
     // Socket Event Will Fire to all members
+    const chat_user = await Chat_User.findAll({
+      where: { chatId: chat.id },
+      attributes: ["id", "userId", "userName"],
+    });
+    emitEvent(
+      req,
+      ALERT,
+      chat_user,
+      `${newAddedUserName} has been added in the group`
+    );
+    emitEvent(req, REFETCH_CHATS, chat_user);
+
     res.status(200).json({
       success: true,
       message: "Member added successfully!",
@@ -242,6 +261,7 @@ exports.removeMembers = async (req, res) => {
     //     return res.status(400).send(error.details[0].message);
     // }
     const { members, chatId } = req.body;
+
     const chat = await Chat.findOne({
       where: {
         id: chatId,
@@ -249,12 +269,14 @@ exports.removeMembers = async (req, res) => {
         creator: req.user.id,
       },
     });
+
     if (!chat) {
       return res.status(400).json({
         success: false,
         message: "You can not remove members!",
       });
     }
+
     for (let i = 0; i < members.length; i++) {
       await Chat_User.destroy({
         where: {
@@ -263,6 +285,28 @@ exports.removeMembers = async (req, res) => {
         },
       });
     }
+
+    const userThatWillBeRemoved = [];
+    const removedMembers = await User.findAll({
+      where: { id: members },
+      attributes: ["fullName"],
+    });
+    for (let i = 0; i < removedMembers.length; i++) {
+      userThatWillBeRemoved.push(removedMembers[i].fullName);
+    }
+
+    // Socket Event Will Fire to all members
+    const chat_user = await Chat_User.findAll({
+      where: { chatId: chat.id },
+      attributes: ["id", "userId", "userName"],
+    });
+
+    emitEvent(req, ALERT, chat_user, {
+      message: `${userThatWillBeRemoved.name} has been removed from the group`,
+      chatId,
+    });
+    emitEvent(req, REFETCH_CHATS, chat_user);
+
     // Socket Event Will Fire to all members
     res.status(200).json({
       success: true,
@@ -419,7 +463,31 @@ exports.createMessage = async (req, res) => {
       ...chat.dataValues,
       attachments: attachments,
     };
+
+    const messageForRealTime = {
+      sender: {
+        id: senderId,
+        name: req.user.userName,
+        avatar_url: req.user.avatar_url,
+      },
+      message: message,
+      chatId: chatId,
+      attachments: attachments,
+    };
+
+    const chat_user = await Chat_User.findAll({
+      where: { chatId: chat.id },
+      attributes: ["id", "userId", "userName", "avatar_url", "createdAt"],
+    });
+
     // Socket Event Will Fire to all members to send message;
+    emitEvent(req, NEW_MESSAGE, chat_user, {
+      message: messageForRealTime,
+      chatId,
+    });
+
+    emitEvent(req, NEW_MESSAGE_ALERT, chat_user, { chatId });
+
     res.status(200).json({
       success: true,
       message: "Message created successfully!",
@@ -483,30 +551,45 @@ exports.getMessage = async (req, res) => {
 exports.leaveGroup = async (req, res) => {
   try {
     const chatId = req.params.id;
+
     const chat = await Chat.findOne({
       where: {
         id: chatId,
         isGroup: true,
       },
     });
+
     if (!chat) {
       return res.status(400).json({
         success: false,
         message: "Group is not present!",
       });
     }
+
     if (chat.creator === req.user.id) {
       return res.status(400).json({
         success: false,
         message: "Creator can not leave the group!",
       });
     }
+
     await Chat_User.destroy({
       where: {
         chatId: chat.id,
         userId: req.user.id,
       },
     });
+
+    const chat_user = await Chat_User.findAll({
+      where: { chatId: chat.id },
+      attributes: ["id", "userId", "userName"],
+    });
+
+    emitEvent(req, ALERT, chat_user, {
+      chatId,
+      message: `User ${req.user.fullName} has left the group`,
+    });
+
     // Socket Event Will Fire to all members
     res.status(200).json({
       success: true,
@@ -541,6 +624,12 @@ exports.deleteGroup = async (req, res) => {
         message: "You can not delete this group!",
       });
     }
+
+    const chat_user = await Chat_User.findAll({
+      where: { chatId: chat.id },
+      attributes: ["id", "userId", "userName"],
+    });
+
     await Chat_User.destroy({
       where: {
         chatId: chat.id,
@@ -548,6 +637,9 @@ exports.deleteGroup = async (req, res) => {
     });
     // Socket Event Will Fire to all members
     await chat.destroy();
+
+    emitEvent(req, REFETCH_CHATS, chat_user);
+
     res.status(200).json({
       success: true,
       message: "Group deleted successfully!",
