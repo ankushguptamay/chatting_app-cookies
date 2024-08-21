@@ -22,11 +22,6 @@ const {
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: "*",
-  },
-});
 
 const corsOptions = {
   origin: [
@@ -37,6 +32,10 @@ const corsOptions = {
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 };
+
+const io = new Server(server, {
+  cors: corsOptions
+});
 
 db.sequelize
   .sync()
