@@ -11,7 +11,7 @@ const getOtherMember = (members, userId) => {
 };
 
 const getSingleChat = (chat, userId) => {
-  const otherMember = this.getOtherMember(chat.members, userId);
+  const otherMember = getOtherMember(chat.members, userId);
   return (transForm = {
     id: chat.id,
     chatName: chat.isGroup ? chat.chatName : otherMember[0].userName,

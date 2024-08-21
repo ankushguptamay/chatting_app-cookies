@@ -68,7 +68,7 @@ io.use((socket, next) => {
 
 io.on("connection", (socket) => {
   const user = socket.user;
-  userSocketIDs.set(user.id.toString(), socket.id);
+  userSocketIDs.set(user.dataValues.id.toString(), socket.id);
 
   socket.on(NEW_MESSAGE, async ({ chatId, members, message }) => {
     const messageForRealTime = {

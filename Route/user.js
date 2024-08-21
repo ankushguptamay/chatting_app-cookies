@@ -40,7 +40,7 @@ const uploadImageAndPDF = require("../Middleware/imageAndPDF");
 
 chat.post("/register", register);
 chat.post("/login", login);
-chat.post("/logOut", logOut);
+chat.get("/logOut", logOut);
 chat.get("/", verifyUserJWT, getMe);
 chat.get("/searchUser", verifyUserJWT, isUserPresent, searchUser);
 chat.put(
