@@ -1,4 +1,5 @@
 const fs = require("fs");
+const { userSocketIDs } = require("../index");
 
 const getOtherMember = (members, userId) => {
   const newMembers = [];
