@@ -129,7 +129,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    userSocketIDs.delete(user._id.toString());
+    userSocketIDs.delete(user.dataValues.id.toString());
     onlineUsers.delete(user._id.toString());
     socket.broadcast.emit(ONLINE_USERS, Array.from(onlineUsers));
   });
