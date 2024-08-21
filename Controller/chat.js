@@ -155,14 +155,15 @@ exports.findChat = async (req, res) => {
         {
           model: Chat_User,
           as: "members",
+          attributes: ["id", "avatar_url", "fullName"],
         },
       ],
     });
-    const transForm = getSingleChat(chat, req.user.id);
+    // const transForm = getSingleChat(chat, req.user.id);
     res.status(200).json({
       success: true,
       message: "Chat fetched successfully!",
-      data: transForm,
+      data: chat,
     });
   } catch (err) {
     res.status(500).send({
