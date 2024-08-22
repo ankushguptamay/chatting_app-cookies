@@ -45,6 +45,9 @@ exports.sendFriendRequest = async (req, res) => {
       sender: { id: id, avatar_url: avatar_url, userName: userName },
       receiverId: receiverId,
     });
+
+    emitEvent(req, NEW_REQUEST, [receiverId]);
+
     // Socket Event Will Fire to all members
     res.status(200).json({
       success: true,

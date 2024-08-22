@@ -9,7 +9,7 @@ const { socketAuthenticator } = require("./Middleware/verifyJWTToken");
 const cookieParser = require("cookie-parser");
 const admin = require("./Route/admin");
 const { Server } = require("socket.io");
-const { getSockets } = require("./Utils/helper");
+const uuid = require("uuid").v4;
 const {
   CHAT_JOINED,
   CHAT_LEAVED,
@@ -72,10 +72,10 @@ io.on("connection", (socket) => {
   socket.on(NEW_MESSAGE, async ({ chatId, members, message }) => {
     const messageForRealTime = {
       message: message,
-      id: db.DataTypes.UUIDV4,
+      id: uuid(),
       sender: {
         id: user.id,
-        name: user.name,
+        name: user.fullName,
         avatar_url: user.avatar_url,
       },
       chat: chatId,
@@ -130,10 +130,16 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     userSocketIDs.delete(user.dataValues.id.toString());
-    onlineUsers.delete(user._id.toString());
+    onlineUsers.delete(user.id.toString());
     socket.broadcast.emit(ONLINE_USERS, Array.from(onlineUsers));
   });
 });
+
+const getSockets = (users = []) => {
+  const sockets = users.map((user) => userSocketIDs.get(user.toString()));
+  return sockets;
+};
+
 
 PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {

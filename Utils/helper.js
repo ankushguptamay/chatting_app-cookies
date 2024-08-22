@@ -1,5 +1,5 @@
 const fs = require("fs");
-const { userSocketIDs } = require("../index");
+// const { userSocketIDs } = require("../index");
 
 const getOtherMember = (members, userId) => {
   const newMembers = [];
@@ -37,11 +37,11 @@ const deleteSingleFile = (filePath) => {
   return;
 };
 
-const getSockets = (users = []) => {
-  const sockets = users.map((user) => userSocketIDs.get(user.toString()));
+// const getSockets = (users = []) => {
+//   const sockets = users.map((user) => userSocketIDs.get(user.toString()));
 
-  return sockets;
-};
+//   return sockets;
+// };
 
 class ErrorHandler extends Error {
   constructor(message, statusCode) {
@@ -55,5 +55,5 @@ module.exports = {
   deleteSingleFile,
   getSingleChat,
   getOtherMember,
-  getSockets,
+  // getSockets,
 };
