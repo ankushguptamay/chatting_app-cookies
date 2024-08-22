@@ -48,11 +48,6 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
 
-app.use("/user", user);
-app.use("/admin", admin);
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", process.env.CLIENT_URL);
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE");
@@ -62,6 +57,13 @@ app.use((req, res, next) => {
     "Authorization"
   );
   next();
+});
+
+
+app.use("/user", user);
+app.use("/admin", admin);
+app.get("/", (req, res) => {
+  res.send("Hello World!");
 });
 
 const userSocketIDs = new Map();
