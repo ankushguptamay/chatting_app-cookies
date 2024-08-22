@@ -24,11 +24,7 @@ const app = express();
 const server = createServer(app);
 
 const corsOptions = {
-  origin: [
-    "http://127.0.0.1:5173",
-    "http://localhost:4173",
-    process.env.CLIENT_URL,
-  ],
+  origin: process.env.CLIENT_URL,
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 };
@@ -139,7 +135,6 @@ const getSockets = (users = []) => {
   const sockets = users.map((user) => userSocketIDs.get(user.toString()));
   return sockets;
 };
-
 
 PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
