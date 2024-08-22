@@ -24,7 +24,11 @@ const app = express();
 const server = createServer(app);
 
 const corsOptions = {
-  origin: process.env.CLIENT_URL,
+  origin: [
+    "http://127.0.0.1:5173",
+    "http://localhost:4173",
+    process.env.CLIENT_URL,
+  ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
 };
@@ -48,6 +52,16 @@ app.use("/user", user);
 app.use("/admin", admin);
 app.get("/", (req, res) => {
   res.send("Hello World!");
+});
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", process.env.CLIENT_URL);
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "Content-Type",
+    "Authorization"
+  );
+  next();
 });
 
 const userSocketIDs = new Map();
