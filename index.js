@@ -86,7 +86,7 @@ io.on("connection", (socket) => {
       message: message,
       senderId: user.id,
       chatId: chatId,
-      userName: user.userName,
+      userName: user.fullName,
       avatar_url: user.avatar_url,
     };
 
