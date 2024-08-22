@@ -155,7 +155,7 @@ exports.findChat = async (req, res) => {
         {
           model: Chat_User,
           as: "members",
-          attributes: ["id", "avatar_url", "fullName"],
+          attributes: ["id", "avatar_url", "userName"],
         },
       ],
     });
