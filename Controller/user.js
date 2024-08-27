@@ -2,6 +2,7 @@ const db = require("../Model");
 const { validateUser, userLogin } = require("../Middleware/validation");
 const User = db.user;
 const Chat = db.chat;
+const Message = db.chatMessage;
 const Chat_User = db.chats_user;
 const Request = db.request;
 const { deleteSingleFile } = require("../Utils/helper");
@@ -190,6 +191,18 @@ exports.addUpdateUserAvatar = async (req, res) => {
     if (avatar.fileName) {
       await deleteFileToBunny(bunnyFolderName, avatar.fileName);
     }
+    await Chat_User.update(
+      {
+        avatar_url: `${process.env.SHOW_BUNNY_FILE_HOSTNAME}/${bunnyFolderName}/${req.file.filename}`,
+      },
+      { where: { userId: req.user.id } }
+    );
+    await Message.update(
+      {
+        avatar_url: `${process.env.SHOW_BUNNY_FILE_HOSTNAME}/${bunnyFolderName}/${req.file.filename}`,
+      },
+      { where: { senderId: req.user.id } }
+    );
     await avatar.update({
       ...avatar,
       avatar_url: `${process.env.SHOW_BUNNY_FILE_HOSTNAME}/${bunnyFolderName}/${req.file.filename}`,

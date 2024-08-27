@@ -48,18 +48,6 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
 
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", process.env.CLIENT_URL);
-  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "Content-Type",
-    "Authorization"
-  );
-  next();
-});
-
-
 app.use("/user", user);
 app.use("/admin", admin);
 app.get("/", (req, res) => {
