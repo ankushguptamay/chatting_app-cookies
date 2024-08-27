@@ -1,7 +1,7 @@
 const fs = require("fs");
-// const { userSocketIDs } = require("../index");
+const { userSocketIDs } = require("./event");
 
-const getOtherMember = (members, userId) => {
+exports.getOtherMember = (members, userId) => {
   const newMembers = [];
   for (let i = 0; i < members.length; i++) {
     if (members[i].userId !== userId) {
@@ -11,7 +11,7 @@ const getOtherMember = (members, userId) => {
   return newMembers;
 };
 
-const getSingleChat = (chat, userId) => {
+exports.getSingleChat = (chat, userId) => {
   const otherMember = getOtherMember(chat.members, userId);
   return (transForm = {
     id: chat.id,
@@ -23,7 +23,7 @@ const getSingleChat = (chat, userId) => {
   });
 };
 
-const deleteSingleFile = (filePath) => {
+exports.deleteSingleFile = (filePath) => {
   if (filePath) {
     // console.log(fs.existsSync(filePath));
     if (fs.existsSync(filePath)) {
@@ -35,25 +35,4 @@ const deleteSingleFile = (filePath) => {
     }
   }
   return;
-};
-
-// const getSockets = (users = []) => {
-//   const sockets = users.map((user) => userSocketIDs.get(user.toString()));
-
-//   return sockets;
-// };
-
-class ErrorHandler extends Error {
-  constructor(message, statusCode) {
-    super(message);
-    this.statusCode = statusCode;
-  }
-}
-
-module.exports = {
-  ErrorHandler,
-  deleteSingleFile,
-  getSingleChat,
-  getOtherMember,
-  // getSockets,
 };

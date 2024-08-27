@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const db = require("../Model");
 const User = db.user;
-const { ErrorHandler } = require("../Utils/helper");
+const { ErrorHandler } = require("../Utils/error");
 const { USER_JWT_SECRET_KEY, ADMIN_JWT_SECRET_KEY } = process.env;
 
 exports.verifyUserJWT = (req, res, next) => {

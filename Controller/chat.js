@@ -15,6 +15,7 @@ const {
   NEW_MESSAGE,
   NEW_MESSAGE_ALERT,
   REFETCH_CHATS,
+  emitEvent,
 } = require("../Utils/event");
 const {
   getOtherMember,

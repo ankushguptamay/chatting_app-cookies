@@ -1,4 +1,4 @@
-const { getSockets } = require("../index");
+const { getSockets } = require("../getSocket");
 
 exports.ALERT = "ALERT";
 exports.REFETCH_CHATS = "REFETCH_CHATS";
@@ -22,3 +22,5 @@ exports.emitEvent = (req, event, users, data) => {
   const usersSocket = getSockets(users);
   io.to(usersSocket).emit(event, data);
 };
+
+exports.userSocketIDs = new Map();

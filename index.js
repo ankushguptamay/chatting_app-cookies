@@ -10,6 +10,8 @@ const cookieParser = require("cookie-parser");
 const admin = require("./Route/admin");
 const { Server } = require("socket.io");
 const uuid = require("uuid").v4;
+const { userSocketIDs } = require("./Utils/event");
+const { getSockets } = require("./Utils/helper");
 const {
   CHAT_JOINED,
   CHAT_LEAVED,
@@ -54,7 +56,7 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-const userSocketIDs = new Map();
+// const userSocketIDs = new Map();
 const onlineUsers = new Set();
 
 io.use((socket, next) => {
@@ -135,16 +137,16 @@ io.on("connection", (socket) => {
   });
 });
 
-const getSockets = (users = []) => {
-  const sockets = users.map((user) => userSocketIDs.get(user.toString()));
-  return sockets;
-};
+// const getSockets = (users = []) => {
+//   const sockets = users.map((user) => userSocketIDs.get(user.toString()));
+//   return sockets;
+// };
 
 PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
-module.exports = {
-  userSocketIDs,
-};
+// module.exports = {
+//   userSocketIDs,
+// };
