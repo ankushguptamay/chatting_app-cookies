@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import db from "../Model/index.js";
-import { validateUser, userLogin } from"../Middleware/validation.js";
+import { validateUser, userLogin } from "../Middleware/validation.js";
 const User = db.user;
 const Chat = db.chat;
 const Message = db.chatMessage;
