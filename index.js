@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import express from "express";
 import bodyParser from "body-parser";
 import db from "./Model/index.js";
-import { resolve } from 'path';
+import { resolve } from "path";
 import cors from "cors";
 import { createServer } from "node:http";
 import user from "./Route/user.js";
@@ -21,7 +21,7 @@ import {
   STOP_TYPING,
 } from "./Utils/event.js";
 
-dotenv.config({ path: resolve(process.cwd(), '.env') });
+dotenv.config({ path: resolve(process.cwd(), ".env") });
 
 const app = express();
 const server = createServer(app);
@@ -40,12 +40,15 @@ const io = new Server(server, {
   cors: corsOptions,
 });
 
+app.set("io", io);
+
 db.sequelize
   .sync()
   .then(() => {
     // console.log("Database synced")
   })
   .catch((error) => console.log(error));
+
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));

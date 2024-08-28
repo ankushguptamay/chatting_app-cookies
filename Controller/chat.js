@@ -482,16 +482,19 @@ export const createMessage = async (req, res) => {
 
     const chat_user = await Chat_User.findAll({
       where: { chatId: chat.id },
-      attributes: ["id", "userId", "userName", "avatar_url", "createdAt"],
+      attributes: ["id", "userId"],
     });
-
+    const users = [];
+    for (let i = 0; i < chat_user.length; i++) {
+      users.push(chat_user.userId);
+    }
     // Socket Event Will Fire to all members to send message;
-    emitEvent(req, NEW_MESSAGE, chat_user, {
+    emitEvent(req, NEW_MESSAGE, users, {
       message: messageForRealTime,
       chatId,
     });
 
-    emitEvent(req, NEW_MESSAGE_ALERT, chat_user, { chatId });
+    emitEvent(req, NEW_MESSAGE_ALERT, users, { chatId });
 
     res.status(200).json({
       success: true,
