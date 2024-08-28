@@ -75,11 +75,10 @@ export const createGroupChat = async (req, res) => {
     }
     // Socket Event Will Fire to all members that `${chatName} group is created by ${creatorName}`;
     const response = { ...chat.dataValues, members: users };
-    const otherMember = getOtherMember(users, userId);
     const transForm = getSingleChat(response, req.user.id);
 
-    emitEvent(req, ALERT, users, `Welcome to ${chatName} group`);
-    emitEvent(req, REFETCH_CHATS, otherMember);
+    emitEvent(req, ALERT, membersArray, `Welcome to ${chatName} group`);
+    emitEvent(req, REFETCH_CHATS, members);
 
     res.status(200).json({
       success: true,
@@ -237,13 +236,17 @@ export const addMembers = async (req, res) => {
       where: { chatId: chat.id },
       attributes: ["id", "userId", "userName"],
     });
+    const users = [];
+    for (let i = 0; i < chat_user.length; i++) {
+      users.push(chat_user.userId);
+    }
     emitEvent(
       req,
       ALERT,
-      chat_user,
+      users,
       `${newAddedUserName} has been added in the group`
     );
-    emitEvent(req, REFETCH_CHATS, chat_user);
+    emitEvent(req, REFETCH_CHATS, users);
 
     res.status(200).json({
       success: true,
@@ -305,12 +308,16 @@ export const removeMembers = async (req, res) => {
       where: { chatId: chat.id },
       attributes: ["id", "userId", "userName"],
     });
-
-    emitEvent(req, ALERT, chat_user, {
+    const remainUsers = [];
+    for (let i = 0; i < chat_user.length; i++) {
+      remainUsers.push(chat_user.userId);
+    }
+    const allUsers = [...remainUsers, members];
+    emitEvent(req, ALERT, remainUsers, {
       message: `${userThatWillBeRemoved.name} has been removed from the group`,
       chatId,
     });
-    emitEvent(req, REFETCH_CHATS, chat_user);
+    emitEvent(req, REFETCH_CHATS, allUsers);
 
     // Socket Event Will Fire to all members
     res.status(200).json({
@@ -588,17 +595,19 @@ export const leaveGroup = async (req, res) => {
       },
     });
 
+    // Socket Event Will Fire to all members
     const chat_user = await Chat_User.findAll({
       where: { chatId: chat.id },
       attributes: ["id", "userId", "userName"],
     });
-
-    emitEvent(req, ALERT, chat_user, {
+    const users = [];
+    for (let i = 0; i < chat_user.length; i++) {
+      users.push(chat_user.userId);
+    }
+    emitEvent(req, ALERT, users, {
       chatId,
       message: `User ${req.user.fullName} has left the group`,
     });
-
-    // Socket Event Will Fire to all members
     res.status(200).json({
       success: true,
       message: "Group leaved successfully!",
@@ -645,8 +654,11 @@ export const deleteGroup = async (req, res) => {
     });
     // Socket Event Will Fire to all members
     await chat.destroy();
-
-    emitEvent(req, REFETCH_CHATS, chat_user);
+    const users = [];
+    for (let i = 0; i < chat_user.length; i++) {
+      users.push(chat_user.userId);
+    }
+    emitEvent(req, REFETCH_CHATS, users);
 
     res.status(200).json({
       success: true,

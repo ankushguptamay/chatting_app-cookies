@@ -26,6 +26,13 @@ dotenv.config({ path: resolve(process.cwd(), ".env") });
 const app = express();
 const server = createServer(app);
 
+db.sequelize
+  .sync()
+  .then(() => {
+    // console.log("Database synced")
+  })
+  .catch((error) => console.log(error));
+
 const corsOptions = {
   origin: [
     "http://127.0.0.1:5173",
@@ -41,13 +48,6 @@ const io = new Server(server, {
 });
 
 app.set("io", io);
-
-db.sequelize
-  .sync()
-  .then(() => {
-    // console.log("Database synced")
-  })
-  .catch((error) => console.log(error));
 
 app.use(bodyParser.json());
 app.use(cookieParser());
