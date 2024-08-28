@@ -62,15 +62,15 @@ db.chatMessage.hasMany(db.messageAttachment, {
   as: "attachments",
 });
 
-queryInterface
-  .addColumn("messageAttachments", "mimeType", {
-    type: DataTypes.STRING,
-  })
-  .then((res) => {
-    console.log("added!");
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+// queryInterface
+//   .addColumn("messageAttachments", "mimeType", {
+//     type: DataTypes.STRING,
+//   })
+//   .then((res) => {
+//     console.log("added!");
+//   })
+//   .catch((err) => {
+//     console.log(err);
+//   });
 
 export default db;
