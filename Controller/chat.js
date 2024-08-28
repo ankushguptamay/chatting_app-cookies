@@ -15,6 +15,7 @@ const Message = db.chatMessage;
 const MessageAttachment = db.messageAttachment;
 import {
   ALERT,
+  emitEvent,
   NEW_MESSAGE,
   NEW_MESSAGE_ALERT,
   REFETCH_CHATS,
