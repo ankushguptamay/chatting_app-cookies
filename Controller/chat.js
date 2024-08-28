@@ -464,6 +464,7 @@ export const createMessage = async (req, res) => {
         await uploadFileToBunny(bunnyFolderName, fileStream, files[i].filename);
         deleteSingleFile(files[i].path);
         const attachment = await MessageAttachment.create({
+          mimeType:files[i].mimetype,
           attachment_url: files[i].path,
           attachmentName: `${process.env.SHOW_BUNNY_FILE_HOSTNAME}/${bunnyFolderName}/${files[i].filename}`,
           messageId: chat.id,

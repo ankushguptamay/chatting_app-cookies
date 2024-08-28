@@ -5,6 +5,9 @@ const MessageAttachSchema = (sequelize, DataTypes) => {
       defaultValue: DataTypes.UUIDV4,
       primaryKey: true,
     },
+    mimeType: {
+      type: DataTypes.STRING,
+    },
     attachment_url: {
       type: DataTypes.STRING(1234),
     },
