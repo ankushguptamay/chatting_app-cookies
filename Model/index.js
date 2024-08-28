@@ -1,6 +1,6 @@
-const dbConfig = require("../Config/db.config.js");
+import dbConfig from "../Config/db.config.js";
 
-const { Sequelize, DataTypes } = require("sequelize");
+import { Sequelize, DataTypes } from "sequelize";
 const sequelize = new Sequelize(
   dbConfig.database,
   dbConfig.user,
@@ -23,13 +23,20 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 db.DataTypes = DataTypes;
 
-db.admin = require("./adminModel.js")(sequelize, Sequelize);
-db.user = require("./user.js")(sequelize, Sequelize);
-db.request = require("./request.js")(sequelize, Sequelize);
-db.chat = require("./chat.js")(sequelize, Sequelize);
-db.chats_user = require("./chats_user.js")(sequelize, Sequelize);
-db.chatMessage = require("./chatMessage.js")(sequelize, Sequelize);
-db.messageAttachment = require("./messageAttachment.js")(sequelize, Sequelize);
+import AdminSchema from "./adminModel.js";
+db.admin = AdminSchema(sequelize, Sequelize);
+import UserSchema from "./user.js";
+db.user = UserSchema(sequelize, Sequelize);
+import RequestSchema from "./request.js";
+db.request = RequestSchema(sequelize, Sequelize);
+import ChatSchema from "./chat.js";
+db.chat = ChatSchema(sequelize, Sequelize);
+import ChatUserSchema from "./chats_user.js";
+db.chats_user = ChatUserSchema(sequelize, Sequelize);
+import MessageSchema from "./chatMessage.js";
+db.chatMessage = MessageSchema(sequelize, Sequelize);
+import MessageAttachSchema from "./messageAttachment.js";
+db.messageAttachment = MessageAttachSchema(sequelize, Sequelize);
 
 db.user.hasMany(db.chats_user, {
   foreignKey: "userId",
@@ -55,4 +62,4 @@ db.chatMessage.hasMany(db.messageAttachment, {
   as: "attachments",
 });
 
-module.exports = db;
+export default db ;

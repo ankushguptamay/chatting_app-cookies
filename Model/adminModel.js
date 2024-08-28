@@ -1,4 +1,4 @@
-module.exports = (sequelize, DataTypes) => {
+const AdminSchema = (sequelize, DataTypes) => {
   const Admin = sequelize.define("admin", {
     id: {
       type: DataTypes.UUID,
@@ -21,3 +21,5 @@ module.exports = (sequelize, DataTypes) => {
   });
   return Admin;
 };
+
+export default AdminSchema;

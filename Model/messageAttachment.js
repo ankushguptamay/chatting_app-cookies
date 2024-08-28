@@ -1,4 +1,4 @@
-module.exports = (sequelize, DataTypes) => {
+const MessageAttachSchema = (sequelize, DataTypes) => {
   const MessageAttachment = sequelize.define("messageAttachments", {
     id: {
       type: DataTypes.UUID,
@@ -17,3 +17,5 @@ module.exports = (sequelize, DataTypes) => {
   });
   return MessageAttachment;
 };
+
+export default MessageAttachSchema 

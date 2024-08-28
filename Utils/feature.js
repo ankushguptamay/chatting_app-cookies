@@ -1,13 +1,17 @@
-const jwt = require("jsonwebtoken");
-exports.cookieOptions = {
+import dotenv from "dotenv";
+dotenv.config();
+
+import jwt from "jsonwebtoken";
+export const cookieOptions = {
   maxAge: 15 * 24 * 60 * 60 * 1000,
   sameSite: "none",
   httpOnly: true,
   secure: true,
 };
 
-exports.sendToken = (res, user, code, message, tokenName) => {
+export const sendToken = (res, user, code, message, tokenName) => {
   let token;
+  console.log("here")
   if (tokenName === "chat-admin-token") {
     token = jwt.sign(
       { id: user.id, email: user.email },
@@ -20,7 +24,7 @@ exports.sendToken = (res, user, code, message, tokenName) => {
     );
   }
 
-  return res.status(code).cookie(tokenName, token, this.cookieOptions).json({
+  return res.status(code).cookie(tokenName, token, cookieOptions).json({
     success: true,
     user,
     message,

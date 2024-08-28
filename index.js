@@ -1,18 +1,17 @@
-require("dotenv").config();
-const express = require("express");
-const bodyParser = require("body-parser");
-const db = require("./Model");
-const cors = require("cors");
-const { createServer } = require("node:http");
-const user = require("./Route/user");
-const { socketAuthenticator } = require("./Middleware/verifyJWTToken");
-const cookieParser = require("cookie-parser");
-const admin = require("./Route/admin");
-const { Server } = require("socket.io");
-const uuid = require("uuid").v4;
-const { userSocketIDs } = require("./Utils/event");
-const { getSockets } = require("./Utils/helper");
-const {
+import dotenv from "dotenv";
+import express from "express";
+import bodyParser from "body-parser";
+import db from "./Model/index.js";
+import { resolve } from 'path';
+import cors from "cors";
+import { createServer } from "node:http";
+import user from "./Route/user.js";
+import { socketAuthenticator } from "./Middleware/verifyJWTToken.js";
+import cookieParser from "cookie-parser";
+import admin from "./Route/admin.js";
+import { Server } from "socket.io";
+import { v4 as uuid } from "uuid";
+import {
   CHAT_JOINED,
   CHAT_LEAVED,
   NEW_MESSAGE,
@@ -20,7 +19,9 @@ const {
   ONLINE_USERS,
   START_TYPING,
   STOP_TYPING,
-} = require("./Utils/event");
+} from "./Utils/event.js";
+
+dotenv.config({ path: resolve(process.cwd(), '.env') });
 
 const app = express();
 const server = createServer(app);
@@ -56,7 +57,7 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-// const userSocketIDs = new Map();
+const userSocketIDs = new Map();
 const onlineUsers = new Set();
 
 io.use((socket, next) => {
@@ -137,16 +138,9 @@ io.on("connection", (socket) => {
   });
 });
 
-// const getSockets = (users = []) => {
-//   const sockets = users.map((user) => userSocketIDs.get(user.toString()));
-//   return sockets;
-// };
-
-PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
-// module.exports = {
-//   userSocketIDs,
-// };
+export { userSocketIDs };

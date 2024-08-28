@@ -1,9 +1,9 @@
-const db = require("../Model");
+import db from "../Model/index.js";
 const User = db.user;
 const Admin = db.admin;
-const { Op } = require("sequelize");
+import { Op } from "sequelize";
 
-exports.isUserPresent = async (req, res, next) => {
+export const isUserPresent = async (req, res, next) => {
   try {
     const user = await User.findOne({
       where: {
@@ -26,7 +26,7 @@ exports.isUserPresent = async (req, res, next) => {
   }
 };
 
-exports.isAdminPresent = async (req, res, next) => {
+export const isAdminPresent = async (req, res, next) => {
   try {
     const admin = await Admin.findOne({
       where: {

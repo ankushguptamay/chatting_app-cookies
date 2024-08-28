@@ -1,10 +1,13 @@
-const jwt = require("jsonwebtoken");
-const db = require("../Model");
+import dotenv from "dotenv";
+dotenv.config();
+
+import jwt from "jsonwebtoken";
+import db from "../Model/index.js";
 const User = db.user;
-const { ErrorHandler } = require("../Utils/error");
+import { ErrorHandler } from "../Utils/helper.js";
 const { USER_JWT_SECRET_KEY, ADMIN_JWT_SECRET_KEY } = process.env;
 
-exports.verifyUserJWT = (req, res, next) => {
+export const verifyUserJWT = (req, res, next) => {
   const token = req.cookies["chat-user-token"];
 
   if (!token) return res.sendStatus(401);
@@ -21,7 +24,7 @@ exports.verifyUserJWT = (req, res, next) => {
   });
 };
 
-exports.verifyAdminJWT = (req, res, next) => {
+export const verifyAdminJWT = (req, res, next) => {
   const token = req.cookies["chat-admin-token"];
 
   if (!token) return res.sendStatus(401);
@@ -38,7 +41,7 @@ exports.verifyAdminJWT = (req, res, next) => {
   });
 };
 
-exports.socketAuthenticator = async (err, socket, next) => {
+export const socketAuthenticator = async (err, socket, next) => {
   try {
     if (err) return next(err);
 

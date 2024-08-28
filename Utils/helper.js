@@ -1,7 +1,7 @@
-const fs = require("fs");
-const { userSocketIDs } = require("./event");
+import fs from "fs";
+import { userSocketIDs } from "../index.js";
 
-exports.getOtherMember = (members, userId) => {
+export const getOtherMember = (members, userId) => {
   const newMembers = [];
   for (let i = 0; i < members.length; i++) {
     if (members[i].userId !== userId) {
@@ -11,7 +11,7 @@ exports.getOtherMember = (members, userId) => {
   return newMembers;
 };
 
-exports.getSingleChat = (chat, userId) => {
+export const getSingleChat = (chat, userId) => {
   const otherMember = getOtherMember(chat.members, userId);
   return (transForm = {
     id: chat.id,
@@ -23,7 +23,7 @@ exports.getSingleChat = (chat, userId) => {
   });
 };
 
-exports.deleteSingleFile = (filePath) => {
+export const deleteSingleFile = (filePath) => {
   if (filePath) {
     // console.log(fs.existsSync(filePath));
     if (fs.existsSync(filePath)) {
@@ -35,4 +35,16 @@ exports.deleteSingleFile = (filePath) => {
     }
   }
   return;
+};
+
+export class ErrorHandler extends Error {
+  constructor(message, statusCode) {
+    super(message);
+    this.statusCode = statusCode;
+  }
+}
+
+export const getSockets = (users = []) => {
+  const sockets = users.map((user) => userSocketIDs.get(user.toString()));
+  return sockets;
 };

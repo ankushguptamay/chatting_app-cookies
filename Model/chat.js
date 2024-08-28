@@ -1,4 +1,4 @@
-module.exports = (sequelize, DataTypes) => {
+const ChatSchema = (sequelize, DataTypes) => {
     const Chat = sequelize.define("chats", {
         id: {
             type: DataTypes.UUID,
@@ -27,3 +27,5 @@ module.exports = (sequelize, DataTypes) => {
     });
     return Chat;
 };
+
+export default ChatSchema

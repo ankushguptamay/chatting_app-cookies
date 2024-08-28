@@ -1,7 +1,10 @@
-const axios = require("axios");
+import dotenv from "dotenv";
+dotenv.config();
+
+import axios from "axios";
 const { BUNNY_HOSTNAME, BUNNY_STORAGE_ACCESS_KEY } = process.env;
 
-exports.uploadFileToBunny = async (bunnyFolderName, fileStream, filename) => {
+export const uploadFileToBunny = async (bunnyFolderName, fileStream, filename) => {
   return new Promise((resolve, reject) => {
     axios
       .put(`${BUNNY_HOSTNAME}/${bunnyFolderName}/${filename}`, fileStream, {
@@ -20,7 +23,7 @@ exports.uploadFileToBunny = async (bunnyFolderName, fileStream, filename) => {
   });
 };
 
-exports.deleteFileToBunny = async (bunnyFolderName, filename) => {
+export const deleteFileToBunny = async (bunnyFolderName, filename) => {
   return new Promise((resolve, reject) => {
     axios
       .delete(`${BUNNY_HOSTNAME}/${bunnyFolderName}/${filename}`, {

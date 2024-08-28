@@ -1,20 +1,23 @@
-const db = require("../Model");
-const { validateUser, userLogin } = require("../Middleware/validation");
+import dotenv from "dotenv";
+dotenv.config();
+
+import db from "../Model/index.js";
+import { validateUser, userLogin } from"../Middleware/validation.js";
 const User = db.user;
 const Chat = db.chat;
 const Message = db.chatMessage;
 const Chat_User = db.chats_user;
 const Request = db.request;
-const { deleteSingleFile } = require("../Utils/helper");
-const bcrypt = require("bcryptjs");
-const { Op } = require("sequelize");
-const { sendToken, cookieOptions } = require("../Utils/feature");
-const { uploadFileToBunny, deleteFileToBunny } = require("../Utils/bunny");
-const fs = require("fs");
+import { deleteSingleFile } from "../Utils/helper.js";
+import bcrypt from "bcryptjs";
+import { Op } from "sequelize";
+import { sendToken, cookieOptions } from "../Utils/feature.js";
+import { uploadFileToBunny, deleteFileToBunny } from "../Utils/bunny.js";
+import fs from "fs";
 const bunnyFolderName = "attachment";
 const SALT = 10;
 
-exports.register = async (req, res) => {
+export const register = async (req, res) => {
   try {
     // Validate Body
     const { error } = validateUser(req.body);
@@ -51,7 +54,7 @@ exports.register = async (req, res) => {
   }
 };
 
-exports.login = async (req, res) => {
+export const login = async (req, res) => {
   try {
     // Validate Body
     const { error } = userLogin(req.body);
@@ -98,7 +101,7 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.logOut = async (req, res) => {
+export const logOut = async (req, res) => {
   try {
     console.log(req.cookies["chat-user-token"]);
     return res
@@ -116,7 +119,7 @@ exports.logOut = async (req, res) => {
   }
 };
 
-exports.getMe = async (req, res) => {
+export const getMe = async (req, res) => {
   try {
     // If Email is already present
     const user = await User.findOne({
@@ -128,7 +131,7 @@ exports.getMe = async (req, res) => {
     // Send final success response
     res.status(200).send({
       success: true,
-      message: "My details successfully!",
+      message: "My details fetched successfully!",
       data: user,
     });
   } catch (err) {
@@ -139,7 +142,7 @@ exports.getMe = async (req, res) => {
   }
 };
 
-exports.searchUser = async (req, res) => {
+export const searchUser = async (req, res) => {
   try {
     const { name } = req.query;
     let condition = {
@@ -170,7 +173,7 @@ exports.searchUser = async (req, res) => {
   }
 };
 
-exports.addUpdateUserAvatar = async (req, res) => {
+export const addUpdateUserAvatar = async (req, res) => {
   try {
     // File should be exist
     if (!req.file) {
@@ -221,7 +224,7 @@ exports.addUpdateUserAvatar = async (req, res) => {
   }
 };
 
-exports.deleteUserAvatar = async (req, res) => {
+export const deleteUserAvatar = async (req, res) => {
   try {
     const user = await User.findOne({ where: { id: req.user.id } });
     await deleteFileToBunny(bunnyFolderName, user.fileName);
@@ -242,7 +245,7 @@ exports.deleteUserAvatar = async (req, res) => {
   }
 };
 
-exports.getAlluser = async (req, res) => {
+export const getAlluser = async (req, res) => {
   try {
     const user = await User.findAll({
       attributes: { exclude: ["password"] },

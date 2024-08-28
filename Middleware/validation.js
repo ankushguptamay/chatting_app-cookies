@@ -1,7 +1,6 @@
-const joi = require("joi");
-const { password } = require("../Config/db.config");
+import joi from "joi";
 
-exports.validateUser = (data) => {
+export const validateUser = (data) => {
   const schema = joi.object().keys({
     fullName: joi.string().min(3).max(50).required(),
     email: joi.string().email().required().label("Email"),
@@ -19,7 +18,7 @@ exports.validateUser = (data) => {
   return schema.validate(data);
 };
 
-exports.userLogin = (data) => {
+export const userLogin = (data) => {
   const schema = joi.object().keys({
     email: joi.string().email().required().label("Email"),
     password: joi
@@ -31,14 +30,14 @@ exports.userLogin = (data) => {
   return schema.validate(data);
 };
 
-exports.createPrivateChat = (data) => {
+export const createPrivateChat = (data) => {
   const schema = joi.object().keys({
     secondId: joi.string().required(),
   });
   return schema.validate(data);
 };
 
-exports.createGroupChat = (data) => {
+export const createGroupChatValidation = (data) => {
   const schema = joi.object().keys({
     members: joi.array().required(),
     chatName: joi.string().required(),
@@ -46,7 +45,7 @@ exports.createGroupChat = (data) => {
   return schema.validate(data);
 };
 
-exports.createMessage = (data) => {
+export const createMessageValidation = (data) => {
   const schema = joi.object().keys({
     chatId: joi.string().required(),
     message: joi.string().optional(),
@@ -54,7 +53,7 @@ exports.createMessage = (data) => {
   return schema.validate(data);
 };
 
-exports.addMembers = (data) => {
+export const addMembersValidation = (data) => {
   const schema = joi.object().keys({
     members: joi.array().required(),
     chatId: joi.string().required(),
@@ -62,21 +61,21 @@ exports.addMembers = (data) => {
   return schema.validate(data);
 };
 
-exports.sendFriendRequest = (data) => {
+export const sendFriendRequestValidation = (data) => {
   const schema = joi.object().keys({
     receiverId: joi.string().required(),
   });
   return schema.validate(data);
 };
 
-exports.acceptFriendRequest = (data) => {
+export const acceptFriendRequestValidation = (data) => {
   const schema = joi.object().keys({
     accept: joi.boolean().required(),
   });
   return schema.validate(data);
 };
 
-exports.adminRegistration = (data) => {
+export const adminRegistration = (data) => {
   const schema = joi.object().keys({
     name: joi.string().required(),
     email: joi.string().email().required().label("Email"),

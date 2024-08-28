@@ -1,4 +1,4 @@
-module.exports = (sequelize, DataTypes) => {
+const RequestSchema = (sequelize, DataTypes) => {
   const Request = sequelize.define("requests", {
     id: {
       type: DataTypes.UUID,
@@ -21,5 +21,5 @@ module.exports = (sequelize, DataTypes) => {
   });
   return Request;
 };
-
+export default RequestSchema ;
 // sender: { id: id, avatar_url: avatar_url, userName: userName }

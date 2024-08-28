@@ -1,4 +1,4 @@
-module.exports = (sequelize, DataTypes) => {
+const MessageSchema  = (sequelize, DataTypes) => {
     const Message = sequelize.define("messages", {
         id: {
             type: DataTypes.UUID,
@@ -24,3 +24,5 @@ module.exports = (sequelize, DataTypes) => {
     });
     return Message;
 };
+
+export default MessageSchema

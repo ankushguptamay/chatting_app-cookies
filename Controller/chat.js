@@ -1,36 +1,38 @@
-const db = require("../Model");
-const {
-  createMessage,
+import dotenv from "dotenv";
+dotenv.config();
+
+import db from "../Model/index.js";
+import {
+  createMessageValidation,
   createPrivateChat,
-  createGroupChat,
-  addMembers,
-} = require("../Middleware/validation");
+  createGroupChatValidation,
+  addMembersValidation,
+} from "../Middleware/validation.js";
 const User = db.user;
 const Chat = db.chat;
 const Chat_User = db.chats_user;
 const Message = db.chatMessage;
 const MessageAttachment = db.messageAttachment;
-const {
+import {
   ALERT,
   NEW_MESSAGE,
   NEW_MESSAGE_ALERT,
   REFETCH_CHATS,
-  emitEvent,
-} = require("../Utils/event");
-const {
+} from "../Utils/event.js";
+import {
   getOtherMember,
   getSingleChat,
   deleteSingleFile,
-} = require("../Utils/helper");
-const { uploadFileToBunny, deleteFileToBunny } = require("../Utils/bunny");
-const fs = require("fs");
+} from "../Utils/helper.js";
+import { uploadFileToBunny, deleteFileToBunny } from "../Utils/bunny.js";
+import fs from "fs";
 const bunnyFolderName = "attachment";
-const { Op } = require("sequelize");
+import { Op } from "sequelize";
 
-exports.createGroupChat = async (req, res) => {
+export const createGroupChat = async (req, res) => {
   try {
     // Validate Body
-    const { error } = createGroupChat(req.body);
+    const { error } = createGroupChatValidation(req.body);
     if (error) {
       return res.status(400).send(error.details[0].message);
     }
@@ -91,7 +93,7 @@ exports.createGroupChat = async (req, res) => {
   }
 };
 
-exports.getUserChat = async (req, res) => {
+export const getUserChat = async (req, res) => {
   try {
     const userId = req.user.id;
     const chats = await Chat.findAll({
@@ -145,7 +147,7 @@ exports.getUserChat = async (req, res) => {
   }
 };
 
-exports.findChat = async (req, res) => {
+export const findChat = async (req, res) => {
   try {
     const chatId = req.params.id;
     const chat = await Chat.findOne({
@@ -175,7 +177,7 @@ exports.findChat = async (req, res) => {
 };
 
 // Admin can add
-exports.addMembers = async (req, res) => {
+export const addMembers = async (req, res) => {
   try {
     // Validate Body
     // const { error } = addMembers(req.body);
@@ -255,7 +257,7 @@ exports.addMembers = async (req, res) => {
 };
 
 // Only creator can remove
-exports.removeMembers = async (req, res) => {
+export const removeMembers = async (req, res) => {
   try {
     // // Validate Body
     // const { error } = addMembers(req.body);
@@ -323,10 +325,10 @@ exports.removeMembers = async (req, res) => {
 };
 
 // Only creator can add Admin
-exports.addAdmins = async (req, res) => {
+export const addAdmins = async (req, res) => {
   try {
     // Validate Body
-    const { error } = addMembers(req.body);
+    const { error } = addMembersValidation(req.body);
     if (error) {
       return res.status(400).send(error.details[0].message);
     }
@@ -370,7 +372,7 @@ exports.addAdmins = async (req, res) => {
 };
 
 // Only creator can remove Admin
-exports.removeAdmins = async (req, res) => {
+export const removeAdmins = async (req, res) => {
   try {
     // Validate Body
     // const { error } = addMembers(req.body);
@@ -417,7 +419,7 @@ exports.removeAdmins = async (req, res) => {
   }
 };
 
-exports.createMessage = async (req, res) => {
+export const createMessage = async (req, res) => {
   try {
     const files = req.files;
     if (files?.length < 1) {
@@ -427,7 +429,7 @@ exports.createMessage = async (req, res) => {
       });
     }
     // Validate Body
-    const { error } = createMessage(req.body);
+    const { error } = createMessageValidation(req.body);
     if (error) {
       return res.status(400).send(error.details[0].message);
     }
@@ -503,7 +505,7 @@ exports.createMessage = async (req, res) => {
   }
 };
 
-exports.getMessage = async (req, res) => {
+export const getMessage = async (req, res) => {
   try {
     const { page } = req.query;
     // Pagination
@@ -550,7 +552,7 @@ exports.getMessage = async (req, res) => {
   }
 };
 
-exports.leaveGroup = async (req, res) => {
+export const leaveGroup = async (req, res) => {
   try {
     const chatId = req.params.id;
 
@@ -605,7 +607,7 @@ exports.leaveGroup = async (req, res) => {
   }
 };
 
-exports.deleteGroup = async (req, res) => {
+export const deleteGroup = async (req, res) => {
   try {
     const chatId = req.params.id;
     const chat = await Chat.findOne({
@@ -654,7 +656,7 @@ exports.deleteGroup = async (req, res) => {
   }
 };
 
-exports.addUpdateGroupAvatar = async (req, res) => {
+export const addUpdateGroupAvatar = async (req, res) => {
   try {
     // File should be exist
     if (!req.file) {
@@ -718,7 +720,7 @@ exports.addUpdateGroupAvatar = async (req, res) => {
   }
 };
 
-exports.deleteGroupAvatar = async (req, res) => {
+export const deleteGroupAvatar = async (req, res) => {
   try {
     const chat = await Chat.findOne({
       where: {
@@ -764,7 +766,7 @@ exports.deleteGroupAvatar = async (req, res) => {
   }
 };
 
-exports.allChat = async (req, res) => {
+export const allChat = async (req, res) => {
   try {
     const chat = await Chat.findAll({
       include: [
@@ -820,7 +822,7 @@ exports.allChat = async (req, res) => {
   }
 };
 
-exports.getDashboardStatus = async (req, res) => {
+export const getDashboardStatus = async (req, res) => {
   try {
     const today = new Date();
     const last7Days = new Date();

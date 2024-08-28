@@ -1,6 +1,6 @@
-const express = require("express");
+import express from "express";
 
-const {
+import {
   register,
   login,
   logOut,
@@ -8,8 +8,8 @@ const {
   searchUser,
   addUpdateUserAvatar,
   deleteUserAvatar,
-} = require("../Controller/user");
-const {
+} from "../Controller/user.js";
+import {
   getUserChat,
   findChat,
   createMessage,
@@ -23,20 +23,20 @@ const {
   leaveGroup,
   deleteGroupAvatar,
   addUpdateGroupAvatar,
-} = require("../Controller/chat");
-const {
+} from "../Controller/chat.js";
+import {
   sendFriendRequest,
   myFriendRequest,
   acceptFriendRequest,
-} = require("../Controller/request");
+} from "../Controller/request.js";
 
 const chat = express.Router();
 
 // middleware
-const { verifyUserJWT } = require("../Middleware/verifyJWTToken");
-const { isUserPresent } = require("../Middleware/isPresent");
-const uploadImage = require("../Middleware/image");
-const uploadImageAndPDF = require("../Middleware/imageAndPDF");
+import { verifyUserJWT } from "../Middleware/verifyJWTToken.js";
+import { isUserPresent } from "../Middleware/isPresent.js";
+import uploadImage from "../Middleware/image.js";
+import uploadImageAndPDF from "../Middleware/imageAndPDF.js";
 
 chat.post("/register", register);
 chat.post("/login", login);
@@ -97,4 +97,4 @@ chat.put(
   acceptFriendRequest
 );
 
-module.exports = chat;
+export default chat ;

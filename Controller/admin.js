@@ -1,12 +1,12 @@
-const db = require("../Model");
+import db from "../Model/index.js";
 const Admin = db.admin;
-const { userLogin, adminRegistration } = require("../Middleware/validation");
-const { sendToken, cookieOptions } = require("../Utils/feature");
-const bcrypt = require("bcryptjs");
-const { Op } = require("sequelize");
+import { userLogin, adminRegistration } from"../Middleware/validation.js";
+import { sendToken, cookieOptions } from"../Utils/feature.js";
+import bcrypt from "bcryptjs";
+import { Op } from "sequelize";
 const SALT = 10;
 
-exports.register = async (req, res) => {
+export const register = async (req, res) => {
   try {
     const { error } = adminRegistration(req.body);
     if (error) {
@@ -38,7 +38,7 @@ exports.register = async (req, res) => {
   }
 };
 
-exports.login = async (req, res) => {
+export const login = async (req, res) => {
   try {
     const { error } = userLogin(req.body);
     if (error) {
@@ -81,7 +81,7 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.logOut = async (req, res) => {
+export const logOut = async (req, res) => {
   try {
     return res
       .status(200)
@@ -98,7 +98,7 @@ exports.logOut = async (req, res) => {
   }
 };
 
-exports.getAdmin = async (req, res) => {
+export const getAdmin = async (req, res) => {
   try {
     const admin = await Admin.findOne({
       where: {

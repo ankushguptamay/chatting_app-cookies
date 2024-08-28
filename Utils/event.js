@@ -1,26 +1,24 @@
-const { getSockets } = require("../getSocket");
+import { getSockets } from "./helper.js";
 
-exports.ALERT = "ALERT";
-exports.REFETCH_CHATS = "REFETCH_CHATS";
+export const ALERT = "ALERT";
+export const REFETCH_CHATS = "REFETCH_CHATS";
 
-exports.NEW_ATTACHMENT = "NEW_ATTACHMENT";
-exports.NEW_MESSAGE_ALERT = "NEW_MESSAGE_ALERT";
+export const NEW_ATTACHMENT = "NEW_ATTACHMENT";
+export const NEW_MESSAGE_ALERT = "NEW_MESSAGE_ALERT";
 
-exports.NEW_REQUEST = "NEW_REQUEST";
-exports.NEW_MESSAGE = "NEW_MESSAGE";
+export const NEW_REQUEST = "NEW_REQUEST";
+export const NEW_MESSAGE = "NEW_MESSAGE";
 
-exports.START_TYPING = "START_TYPING";
-exports.STOP_TYPING = "STOP_TYPING";
+export const START_TYPING = "START_TYPING";
+export const STOP_TYPING = "STOP_TYPING";
 
-exports.CHAT_JOINED = "CHAT_JOINED";
-exports.CHAT_LEAVED = "CHAT_LEAVED";
+export const CHAT_JOINED = "CHAT_JOINED";
+export const CHAT_LEAVED = "CHAT_LEAVED";
 
-exports.ONLINE_USERS = "ONLINE_USERS";
+export const ONLINE_USERS = "ONLINE_USERS";
 
-exports.emitEvent = (req, event, users, data) => {
+export const emitEvent = (req, event, users, data) => {
   const io = req.app.get("io");
   const usersSocket = getSockets(users);
   io.to(usersSocket).emit(event, data);
 };
-
-exports.userSocketIDs = new Map();

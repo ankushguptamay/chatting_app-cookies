@@ -1,20 +1,20 @@
-const db = require("../Model");
-const { NEW_REQUEST, REFETCH_CHATS, emitEvent } = require("../Utils/event");
+import db from "../Model/index.js";
+import { NEW_REQUEST, REFETCH_CHATS, emitEvent } from "../Utils/event.js";
 const Request = db.request;
 const User = db.user;
 const Chat = db.chat;
 const Chat_User = db.chats_user;
-const {
-  sendFriendRequest,
-  acceptFriendRequest,
-} = require("../Middleware/validation");
-const { getSingleChat } = require("../Utils/helper");
-const { Op } = require("sequelize");
+import {
+  sendFriendRequestValidation,
+  acceptFriendRequestValidation,
+} from "../Middleware/validation.js";
+import { getSingleChat } from "../Utils/helper.js";
+import { Op } from "sequelize";
 
-exports.sendFriendRequest = async (req, res) => {
+export const sendFriendRequest = async (req, res) => {
   try {
     // Validate Body
-    const { error } = sendFriendRequest(req.body);
+    const { error } = sendFriendRequestValidation(req.body);
     if (error) {
       return res.status(400).send(error.details[0].message);
     }
@@ -61,7 +61,7 @@ exports.sendFriendRequest = async (req, res) => {
   }
 };
 
-exports.myFriendRequest = async (req, res) => {
+export const myFriendRequest = async (req, res) => {
   try {
     const { id } = req.user;
     const request = await Request.findAll({
@@ -81,10 +81,10 @@ exports.myFriendRequest = async (req, res) => {
   }
 };
 
-exports.acceptFriendRequest = async (req, res) => {
+export const acceptFriendRequest = async (req, res) => {
   try {
     // Validate Body
-    const { error } = acceptFriendRequest(req.body);
+    const { error } = acceptFriendRequestValidation(req.body);
     if (error) {
       return res.status(400).send(error.details[0].message);
     }
