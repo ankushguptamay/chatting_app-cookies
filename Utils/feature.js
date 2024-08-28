@@ -11,7 +11,6 @@ export const cookieOptions = {
 
 export const sendToken = (res, user, code, message, tokenName) => {
   let token;
-  console.log("here")
   if (tokenName === "chat-admin-token") {
     token = jwt.sign(
       { id: user.id, email: user.email },
