@@ -141,7 +141,7 @@ export const acceptFriendRequest = async (req, res) => {
     // Socket Event Will Fire to all members
     res.status(200).json({
       success: true,
-      message: "Request acceptd successfully!",
+      message: "Request accepted successfully!",
       senderId: request.senderId,
     });
   } catch (err) {

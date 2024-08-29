@@ -21,4 +21,4 @@ const MessageAttachSchema = (sequelize, DataTypes) => {
   return MessageAttachment;
 };
 
-export default MessageAttachSchema 
+export default MessageAttachSchema;
