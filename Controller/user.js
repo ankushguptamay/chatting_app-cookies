@@ -206,6 +206,12 @@ export const addUpdateUserAvatar = async (req, res) => {
       },
       { where: { senderId: req.user.id } }
     );
+    await Request.update(
+      {
+        sender_avatar_url: `${process.env.SHOW_BUNNY_FILE_HOSTNAME}/${bunnyFolderName}/${req.file.filename}`,
+      },
+      { where: { senderId: req.user.id } }
+    );
     await avatar.update({
       ...avatar,
       avatar_url: `${process.env.SHOW_BUNNY_FILE_HOSTNAME}/${bunnyFolderName}/${req.file.filename}`,
@@ -270,7 +276,7 @@ export const getAlluser = async (req, res) => {
           Request.count({
             where: {
               [Op.or]: [
-                { [Op.and]: [{ "sender.id": id }, { status: "Accepted" }] },
+                { [Op.and]: [{ senderId: id }, { status: "Accepted" }] },
                 { [Op.and]: [{ status: "Accepted" }, { receiverId: id }] },
               ],
             },

@@ -29,8 +29,8 @@ export const sendFriendRequest = async (req, res) => {
     const request = await Request.findOne({
       where: {
         [Op.or]: [
-          { [Op.and]: [{ "sender.id": id }, { receiverId: receiverId }] },
-          { [Op.and]: [{ "sender.id": receiverId }, { receiverId: id }] },
+          { [Op.and]: [{ senderId: id }, { receiverId: receiverId }] },
+          { [Op.and]: [{ senderId: receiverId }, { receiverId: id }] },
         ],
       },
     });
@@ -42,7 +42,9 @@ export const sendFriendRequest = async (req, res) => {
     }
     await Request.create({
       status: "Pending",
-      sender: { id: id, avatar_url: avatar_url, userName: userName },
+      senderId: id,
+      senderName: userName,
+      sender_avatar_url: avatar_url,
       receiverId: receiverId,
     });
 
@@ -116,7 +118,7 @@ export const acceptFriendRequest = async (req, res) => {
       });
     }
     let chat;
-    const members = [request.sender.id, id];
+    const members = [request.senderId, id];
     const newChat = await Chat.create({ isGroup: false });
     const users = [];
     for (let i = 0; i < members.length; i++) {
@@ -140,7 +142,7 @@ export const acceptFriendRequest = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Request acceptd successfully!",
-      senderId: request.sender.id,
+      senderId: request.senderId,
     });
   } catch (err) {
     res.status(500).send({

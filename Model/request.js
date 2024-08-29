@@ -12,8 +12,14 @@ const RequestSchema = (sequelize, DataTypes) => {
       },
       defaultValue: "Pending",
     },
-    sender: {
-      type: DataTypes.JSON,
+    senderId: {
+      type: DataTypes.STRING,
+    },
+    senderName: {
+      type: DataTypes.STRING,
+    },
+    sender_avatar_url: {
+      type: DataTypes.STRING(1234),
     },
     receiverId: {
       type: DataTypes.STRING,
