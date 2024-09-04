@@ -6,11 +6,15 @@ import { resolve } from "path";
 import cors from "cors";
 import { createServer } from "node:http";
 import user from "./Route/user.js";
-import { socketAuthenticator } from "./Middleware/verifyJWTToken.js";
+import {
+  socketAuthenticator,
+  verifyUserJWT,
+} from "./Middleware/verifyJWTToken.js";
 import cookieParser from "cookie-parser";
 import admin from "./Route/admin.js";
 import { Server } from "socket.io";
-import { v4 as uuid } from "uuid";
+import { findChat } from "./Controller/chat.js";
+import { isUserPresent } from "./Middleware/isPresent.js";
 import {
   CHAT_JOINED,
   CHAT_LEAVED,
@@ -20,6 +24,7 @@ import {
   START_TYPING,
   STOP_TYPING,
 } from "./Utils/event.js";
+import { v4 as uuid } from "uuid";
 import { getSockets } from "./Utils/helper.js";
 
 dotenv.config({ path: resolve(process.cwd(), ".env") });
@@ -56,6 +61,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
 
 app.use("/user", user);
+app.get("user/findChat/:id", verifyUserJWT, isUserPresent, findChat);
 app.use("/admin", admin);
 app.get("/", (req, res) => {
   res.send("Hello World!");
@@ -64,18 +70,15 @@ app.get("/", (req, res) => {
 const userSocketIDs = new Map();
 const onlineUsers = new Set();
 
-io.use((socket, next) => {
-  cookieParser()(
-    socket.request,
-    socket.request.res,
-    async (err) => await socketAuthenticator(err, socket, next)
-  );
+io.use(async (socket, next) => {
+  await socketAuthenticator(socket, next);
 });
 
 io.on("connection", (socket) => {
   const user = socket.user;
+  // console.log(user);
   userSocketIDs.set(user.dataValues.id.toString(), socket.id);
-
+  // console.log(userSocketIDs);
   socket.on(NEW_MESSAGE, async ({ chatId, members, message }) => {
     const messageForRealTime = {
       message: message,

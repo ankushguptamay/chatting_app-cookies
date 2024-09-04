@@ -1,7 +1,7 @@
 import db from "../Model/index.js";
 const Admin = db.admin;
-import { userLogin, adminRegistration } from"../Middleware/validation.js";
-import { sendToken, cookieOptions } from"../Utils/feature.js";
+import { userLogin, adminRegistration } from "../Middleware/validation.js";
+import { sendAccessToken } from "../Utils/feature.js";
 import bcrypt from "bcryptjs";
 import { Op } from "sequelize";
 const SALT = 10;
@@ -29,7 +29,8 @@ export const register = async (req, res) => {
       ...req.body,
       password: hashedPassword,
     });
-    sendToken(res, admin, 201, "Admin created", "chat-admin-token");
+
+    sendAccessToken(res, admin, 201, "Admin created", "admin");
   } catch (err) {
     res.status(500).send({
       success: false,
@@ -66,30 +67,8 @@ export const login = async (req, res) => {
         message: "Invalid email or password!",
       });
     }
-    sendToken(
-      res,
-      admin,
-      200,
-      `Welcome Back, ${admin.name}`,
-      "chat-admin-token"
-    );
-  } catch (err) {
-    res.status(500).send({
-      success: false,
-      message: err.message,
-    });
-  }
-};
 
-export const logOut = async (req, res) => {
-  try {
-    return res
-      .status(200)
-      .cookie("chat-admin-token", "", { ...cookieOptions, maxAge: 0 })
-      .json({
-        success: true,
-        message: "Logged out successfully",
-      });
+    sendAccessToken(res, admin, 200, `Welcome Back, ${admin.name}`, "admin");
   } catch (err) {
     res.status(500).send({
       success: false,

@@ -3,7 +3,7 @@ import express from "express";
 import {
   register,
   login,
-  logOut,
+  // logOut,
   getMe,
   searchUser,
   addUpdateUserAvatar,
@@ -40,7 +40,7 @@ import uploadImageAndPDF from "../Middleware/imageAndPDF.js";
 
 chat.post("/register", register);
 chat.post("/login", login);
-chat.get("/logOut", logOut);
+// chat.get("/logOut", logOut);
 chat.get("/", verifyUserJWT, getMe);
 chat.get("/searchUser", verifyUserJWT, isUserPresent, searchUser);
 chat.put(

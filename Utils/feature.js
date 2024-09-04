@@ -2,16 +2,10 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import jwt from "jsonwebtoken";
-export const cookieOptions = {
-  maxAge: 15 * 24 * 60 * 60 * 1000,
-  sameSite: "none",
-  httpOnly: true,
-  secure: true,
-};
 
-export const sendToken = (res, user, code, message, tokenName) => {
+export const sendAccessToken = (res, user, code, message, tokenName) => {
   let token;
-  if (tokenName === "chat-admin-token") {
+  if (tokenName === "admin") {
     token = jwt.sign(
       { id: user.id, email: user.email },
       process.env.ADMIN_JWT_SECRET_KEY
@@ -23,8 +17,9 @@ export const sendToken = (res, user, code, message, tokenName) => {
     );
   }
 
-  return res.status(code).cookie(tokenName, token, cookieOptions).json({
+  return res.status(code).json({
     success: true,
+    AccessToken: token,
     user,
     message,
   });

@@ -11,7 +11,7 @@ const Request = db.request;
 import { deleteSingleFile } from "../Utils/helper.js";
 import bcrypt from "bcryptjs";
 import { Op } from "sequelize";
-import { sendToken, cookieOptions } from "../Utils/feature.js";
+import { sendAccessToken } from "../Utils/feature.js";
 import { uploadFileToBunny, deleteFileToBunny } from "../Utils/bunny.js";
 import fs from "fs";
 const bunnyFolderName = "attachment";
@@ -45,7 +45,7 @@ export const register = async (req, res) => {
       password: hashedPassword,
     });
     // Send final success response
-    sendToken(res, user, 201, "User created", "chat-user-token");
+    sendAccessToken(res, user, 201, "User created", "user");
   } catch (err) {
     res.status(500).send({
       success: false,
@@ -74,6 +74,7 @@ export const login = async (req, res) => {
         message: "Invalid email or password!",
       });
     }
+    console.log("Here")
     // Compare password with hashed password
     const validPassword = await bcrypt.compare(
       req.body.password,
@@ -85,32 +86,8 @@ export const login = async (req, res) => {
         message: "Invalid email or password!",
       });
     }
-    // Send final success response
-    sendToken(
-      res,
-      user,
-      200,
-      `Welcome Back, ${user.fullName}`,
-      "chat-user-token"
-    );
-  } catch (err) {
-    res.status(500).send({
-      success: false,
-      message: err.message,
-    });
-  }
-};
-
-export const logOut = async (req, res) => {
-  try {
-    console.log(req.cookies["chat-user-token"]);
-    return res
-      .status(200)
-      .cookie("chat-user-token", "", { ...cookieOptions, maxAge: 0 })
-      .json({
-        success: true,
-        message: "Logged out successfully",
-      });
+   
+    sendAccessToken(res, user, 200, `Welcome Back, ${user.fullName}`, "user");
   } catch (err) {
     res.status(500).send({
       success: false,

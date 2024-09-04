@@ -13,14 +13,15 @@ export const getOtherMember = (members, userId) => {
 
 export const getSingleChat = (chat, userId) => {
   const otherMember = getOtherMember(chat.members, userId);
-  return (transForm = {
+  const transForm = {
     id: chat.id,
     chatName: chat.isGroup ? chat.chatName : otherMember[0].userName,
     members: otherMember,
     isGroup: chat.isGroup,
     avatar_url: chat.isGroup ? chat.avatar_url : otherMember[0].avatar_url,
     creator: chat.creator,
-  });
+  };
+  return transForm;
 };
 
 export const deleteSingleFile = (filePath) => {
