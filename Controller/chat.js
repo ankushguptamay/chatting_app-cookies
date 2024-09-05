@@ -465,7 +465,7 @@ export const createMessage = async (req, res) => {
         await uploadFileToBunny(bunnyFolderName, fileStream, files[i].filename);
         deleteSingleFile(files[i].path);
         const attachment = await MessageAttachment.create({
-          mimeType:files[i].mimetype,
+          mimeType: files[i].mimetype,
           attachment_url: files[i].path,
           attachmentName: `${process.env.SHOW_BUNNY_FILE_HOSTNAME}/${bunnyFolderName}/${files[i].filename}`,
           messageId: chat.id,
@@ -900,7 +900,7 @@ export const findGroupChatMembers = async (req, res) => {
   try {
     const chatId = req.params.id;
     const members = await Chat_User.findAll({
-      where: {chatId: chatId},
+      where: { chatId: chatId },
       attributes: ["userId", "avatar_url", "userName"],
       order: [["userName", "ASC"]],
     });
@@ -909,6 +909,41 @@ export const findGroupChatMembers = async (req, res) => {
       success: true,
       message: "Chat fetched successfully!",
       data: members,
+    });
+  } catch (err) {
+    res.status(500).send({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+export const userNotInGroup = async (req, res) => {
+  try {
+    const chatId = req.params.id;
+    const chat = await Chat.findOne({
+      where: {
+        id: chatId,
+      },
+      include: [
+        {
+          model: Chat_User,
+          as: "members",
+          attributes: ["userId", "avatar_url", "userName"],
+        },
+      ],
+    });
+
+    const members = [];
+    for (let i = 0; i < chat.members; i++) {
+      members.push(chat.members[i].userId);
+    }
+    const users = await User.findAll({ where: { [Op.ne]: [members] } });
+
+    res.status(200).json({
+      success: true,
+      message: "users fetched successfully!",
+      data: users,
     });
   } catch (err) {
     res.status(500).send({

@@ -24,6 +24,7 @@ import {
   deleteGroupAvatar,
   addUpdateGroupAvatar,
   findGroupChatMembers,
+  userNotInGroup,
 } from "../Controller/chat.js";
 import {
   sendFriendRequest,
@@ -57,6 +58,7 @@ chat.post("/createGroupChat", verifyUserJWT, isUserPresent, createGroupChat);
 chat.get("/getUserChat", verifyUserJWT, isUserPresent, getUserChat);
 chat.get("/findChat/:id", verifyUserJWT, isUserPresent, findChat);
 chat.get("/members/:id", verifyUserJWT, isUserPresent, findGroupChatMembers);
+chat.get("/userNotInChat/:id", verifyUserJWT, isUserPresent, userNotInGroup);
 chat.put("/addAdmins", verifyUserJWT, isUserPresent, addAdmins);
 chat.put("/addMembers", verifyUserJWT, isUserPresent, addMembers);
 chat.put("/removeAdmins", verifyUserJWT, isUserPresent, removeAdmins);
