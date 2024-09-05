@@ -311,7 +311,7 @@ export const removeMembers = async (req, res) => {
     });
     const remainUsers = [];
     for (let i = 0; i < chat_user.length; i++) {
-      remainUsers.push(chat_user.userId);
+      remainUsers.push(chat_user[i].userId);
     }
     const allUsers = [...remainUsers, members];
     emitEvent(req, ALERT, remainUsers, {
@@ -495,7 +495,7 @@ export const createMessage = async (req, res) => {
     });
     const users = [];
     for (let i = 0; i < chat_user.length; i++) {
-      users.push(chat_user.userId);
+      users.push(chat_user[i].userId);
     }
     // Socket Event Will Fire to all members to send message;
     emitEvent(req, NEW_MESSAGE, users, {
@@ -604,7 +604,7 @@ export const leaveGroup = async (req, res) => {
     });
     const users = [];
     for (let i = 0; i < chat_user.length; i++) {
-      users.push(chat_user.userId);
+      users.push(chat_user[i].userId);
     }
     emitEvent(req, ALERT, users, {
       chatId,
@@ -658,7 +658,7 @@ export const deleteGroup = async (req, res) => {
     await chat.destroy();
     const users = [];
     for (let i = 0; i < chat_user.length; i++) {
-      users.push(chat_user.userId);
+      users.push(chat_user[i].userId);
     }
     emitEvent(req, REFETCH_CHATS, users);
 
