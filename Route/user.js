@@ -23,6 +23,7 @@ import {
   leaveGroup,
   deleteGroupAvatar,
   addUpdateGroupAvatar,
+  findGroupChatMembers,
 } from "../Controller/chat.js";
 import {
   sendFriendRequest,
@@ -55,6 +56,7 @@ chat.put("/deleteUserAvatar", verifyUserJWT, isUserPresent, deleteUserAvatar);
 chat.post("/createGroupChat", verifyUserJWT, isUserPresent, createGroupChat);
 chat.get("/getUserChat", verifyUserJWT, isUserPresent, getUserChat);
 chat.get("/findChat/:id", verifyUserJWT, isUserPresent, findChat);
+chat.get("/members/:id", verifyUserJWT, isUserPresent, findGroupChatMembers);
 chat.put("/addAdmins", verifyUserJWT, isUserPresent, addAdmins);
 chat.put("/addMembers", verifyUserJWT, isUserPresent, addMembers);
 chat.put("/removeAdmins", verifyUserJWT, isUserPresent, removeAdmins);
@@ -97,4 +99,4 @@ chat.put(
   acceptFriendRequest
 );
 
-export default chat ;
+export default chat;

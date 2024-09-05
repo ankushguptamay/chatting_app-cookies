@@ -238,8 +238,9 @@ export const addMembers = async (req, res) => {
     });
     const users = [];
     for (let i = 0; i < chat_user.length; i++) {
-      users.push(chat_user.userId);
+      users.push(chat_user[i].userId);
     }
+
     emitEvent(
       req,
       ALERT,
@@ -886,6 +887,28 @@ export const getDashboardStatus = async (req, res) => {
       success: true,
       message: "Dashboard fetched successfully!",
       data: status,
+    });
+  } catch (err) {
+    res.status(500).send({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+export const findGroupChatMembers = async (req, res) => {
+  try {
+    const chatId = req.params.id;
+    const members = await Chat_User.findAll({
+      where: {chatId: chatId},
+      attributes: ["userId", "avatar_url", "userName"],
+      order: [["userName", "ASC"]],
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Chat fetched successfully!",
+      data: members,
     });
   } catch (err) {
     res.status(500).send({
