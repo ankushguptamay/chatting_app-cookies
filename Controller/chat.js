@@ -929,7 +929,7 @@ export const userNotInGroup = async (req, res) => {
         {
           model: Chat_User,
           as: "members",
-          attributes: ["userId", "avatar_url", "userName"],
+          attributes: ["userId", "avatar_url", "userName", "isAdmin"],
         },
       ],
     });
