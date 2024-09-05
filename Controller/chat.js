@@ -901,7 +901,7 @@ export const findGroupChatMembers = async (req, res) => {
     const chatId = req.params.id;
     const members = await Chat_User.findAll({
       where: { chatId: chatId },
-      attributes: ["userId", "avatar_url", "userName"],
+      attributes: ["userId", "avatar_url", "userName", "isAdmin"],
       order: [["userName", "ASC"]],
     });
 
@@ -933,13 +933,13 @@ export const userNotInGroup = async (req, res) => {
         },
       ],
     });
-
     const members = [];
-    for (let i = 0; i < chat.members; i++) {
+    for (let i = 0; i < chat.members.length; i++) {
       members.push(chat.members[i].userId);
     }
-    const users = await User.findAll({ where: { [Op.ne]: [members] } });
-
+    const users = await User.findAll({
+      where: { id: { [Op.notIn]: members } },
+    });
     res.status(200).json({
       success: true,
       message: "users fetched successfully!",

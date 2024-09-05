@@ -74,7 +74,7 @@ export const login = async (req, res) => {
         message: "Invalid email or password!",
       });
     }
-    console.log("Here")
+    // console.log("Here")
     // Compare password with hashed password
     const validPassword = await bcrypt.compare(
       req.body.password,
@@ -86,7 +86,7 @@ export const login = async (req, res) => {
         message: "Invalid email or password!",
       });
     }
-   
+
     sendAccessToken(res, user, 200, `Welcome Back, ${user.fullName}`, "user");
   } catch (err) {
     res.status(500).send({
