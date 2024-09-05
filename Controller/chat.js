@@ -899,16 +899,22 @@ export const getDashboardStatus = async (req, res) => {
 export const findGroupChatMembers = async (req, res) => {
   try {
     const chatId = req.params.id;
-    const members = await Chat_User.findAll({
+    const membersInGroup = await Chat_User.findAll({
       where: { chatId: chatId },
       attributes: ["userId", "avatar_url", "userName", "isAdmin"],
       order: [["userName", "ASC"]],
     });
-
+    const members = [];
+    for (let i = 0; i < membersInGroup.length; i++) {
+      members.push(membersInGroup[i].userId);
+    }
+    const users = await User.findAll({
+      where: { id: members },
+    });
     res.status(200).json({
       success: true,
-      message: "Chat fetched successfully!",
-      data: members,
+      message: "Chat members fetched successfully!",
+      data: users,
     });
   } catch (err) {
     res.status(500).send({
